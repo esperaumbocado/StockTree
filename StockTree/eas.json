@@ -6,9 +6,26 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "preview": {
+      "distribution": "internal",
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview2": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview4": {
       "distribution": "internal"
     },
     "production": {
