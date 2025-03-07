@@ -1,12 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { Card } from "react-native-paper";
 
-const LocationCard = ({ locationName, capacity, itemsStored }) => {
+const LocationCard = ({ locationName, capacity, itemsStored, icon }) => {
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Text style={styles.title}>{locationName}</Text>
+        <View style={styles.header}>
+          <Image source={{ uri: icon }} style={styles.icon} />
+          <Text style={styles.title}>{locationName}</Text>
+        </View>
         <Text style={styles.details}>Capacity: {capacity}</Text>
         <Text style={styles.details}>Items Stored: {itemsStored}</Text>
       </Card.Content>
@@ -21,6 +24,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 3,
     backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  icon: {
+    width: 40,
+    height: 40,
+    marginRight: 10,
   },
   title: {
     fontSize: 18,
