@@ -1,123 +1,123 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Image, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, useColorScheme, View } from 'react-native';
+import { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import LocationCard from '@/components/LocationCard';
+import CategoryCard from '@/components/CategoryCard';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen() {
-  const [storageLocations, setStorageLocations] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const colorScheme = useColorScheme();  // Get the current theme (light or dark)
+  const colorScheme = useColorScheme();
 
-  const fetchLocations = async () => {
+  const fetchCategories = async () => {
     try {
       setLoading(true);
       await loadApiUrl();
       if (!apiUrl) return;
 
       const params = new URLSearchParams({
-        limit: '100',
+        cascade: false, // Example limit, adjust as necessary
         ordering: 'name',
-        cascade: 'false',
       });
 
-      const response = await fetch(`${apiUrl}?${params.toString()}`, {
+      console.log('fetching from:' , `${apiUrl}/?${params.toString()}`);
+      const response = await fetch(`${apiUrl}/?${params.toString()}`, {
         method: 'GET',
         headers: {
           'Authorization': 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
-          'Content-Application': 'application/json',
           'Accept': 'application/json',
           'Connection': 'keep-alive',
           'Host': 'inventree.localhost',
         },
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const rawData = await response.text();
+      console.log('Raw response text:', rawData);  // Log raw response to the console
+
       if (!rawData) {
         throw new Error('Empty response received.');
       }
 
       let data;
       try {
-        data = JSON.parse(rawData);
+        data = JSON.parse(rawData);  // Attempt to parse the response as JSON
       } catch (e) {
-        throw new Error('Error parsing JSON response');
+        throw new Error('Error parsing JSON response: ' + e.message);  // Add error message
       }
 
-      const locations = data.results.map(item => ({
+
+      console.log('Fetched data:', data);
+
+      const fetchedCategories = data.map(item => ({
         id: item.pk,
-        locationName: item.name || 'Unknown',
-        capacity: item.items,
-        itemsStored: item.tags.length || 0,
-        sublocations: item.sublocations,
-        locationType: item.location_type,
+        name: item.name,
+        description: item.description,
+        partCount: item.part_count,
+        icon: item.icon,
       }));
 
-      setStorageLocations(locations);
+      setCategories(fetchedCategories);
     } catch (error) {
-      console.error('Error fetching storage locations:', error.message);
+      console.error('Error fetching categories:', error.message);
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      setLoading(false);  // Stop loading after the request
+      setRefreshing(false);  // Stop refreshing after the pull-to-refresh action
     }
   };
+
 
   const loadApiUrl = async () => {
     const storedUrl = await SecureStore.getItemAsync('API_URL');
     if (storedUrl) {
-      setApiUrl(`${storedUrl}/api/stock/location/`);
+      setApiUrl(`${storedUrl}/api/part/category`);
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      fetchLocations();
+      fetchCategories();
     }, [apiUrl])
   );
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchLocations();
+    await fetchCategories();
   };
 
-  // Get dynamic background and text colors based on theme
-  const headerBackgroundColor = '#A1E8C5'; // Same green for both light and dark mode
-  const logoBorderColor = colorScheme === 'dark' ? '#A1E8C5' : '#1D3D47'; // Adjust for contrast in dark mode
-  const headerTextColor = colorScheme === 'dark' ? '#fff' : '#1D3D47'; // Light text in dark mode
-  const cardBackgroundColor = colorScheme === 'dark' ? '##fff' : '#F4F9FA'; // Darker background for cards in dark mode
+  const headerBackgroundColor = '#A1E8C5';
+  const headerTextColor = colorScheme === 'dark' ? '#fff' : '#1D3D47';
 
   return (
     <ScrollView
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-        />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <ParallaxScrollView
-        headerBackgroundColor={{ light: headerBackgroundColor, dark: headerBackgroundColor }} // Same green for header in both modes
+        headerBackgroundColor={{ light: headerBackgroundColor, dark: headerBackgroundColor }}
+        contentBackgroundColor="white"  // Ensure background content is white
         headerImage={
           <View style={styles.logoContainer}>
             <Image
               source={require('@/assets/images/fraunhofer.png')}
-              style={[styles.logo, { borderColor: logoBorderColor }]}
+              style={styles.logo}
             />
           </View>
         }
       >
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title" style={[styles.headerText, { color: headerTextColor }]}>
-            Stock Management
+            Categories
           </ThemedText>
         </ThemedView>
       </ParallaxScrollView>
@@ -125,18 +125,17 @@ export default function HomeScreen() {
       {loading ? (
         <ActivityIndicator size="large" color="#A1E8C5" style={styles.loader} />
       ) : (
-        <ScrollView style={[styles.cardContainer, { backgroundColor: cardBackgroundColor }]}>
-          {storageLocations.map(({ id, locationName, capacity, itemsStored, sublocations, locationType }) => (
-            <LocationCard
+        <View style={styles.categoryContainer}>
+          {categories.map(({ id, name, description, partCount, icon }) => (
+            <CategoryCard
               key={id}
-              locationName={locationName}
-              capacity={capacity}
-              itemsStored={itemsStored}
-              sublocations={sublocations}
-              locationType={locationType}
+              name={name}
+              description={description}
+              partCount={partCount}
+              icon={icon}
             />
           ))}
-        </ScrollView>
+        </View>
       )}
     </ScrollView>
   );
@@ -147,19 +146,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 16,
   },
-  logoContainer: {
-    flex: 1,  // Allow the container to take up available space
-    justifyContent: 'center',  // Vertically center the logo
-    alignItems: 'center',  // Horizontally center the logo
-    minHeight: 120,  // Ensure there's enough space for centering
-  },
-  logo: {
-    height: 120,
-    width: '80%',  // Adjust width to make the logo more prominent horizontally
-    borderRadius: 10,
-    borderWidth: 1,
-    marginBottom: 16, // Space below logo
-  },
   headerText: {
     fontSize: 28,
     fontWeight: '600',
@@ -168,7 +154,19 @@ const styles = StyleSheet.create({
   loader: {
     marginTop: 20,
   },
-  cardContainer: {
-    padding: 20,
+  categoryContainer: {
+    padding: 16,
+  },
+  logoContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 250,  // Adjusted to fit the header image nicely
+    flexDirection: 'column',  // Ensure the content inside is stacked vertically
+  },
+  logo: {
+    height: 100,  // Image size
+    width: '80%',  // Image width
+    borderRadius: 10,
+    marginBottom: 16,
   },
 });
