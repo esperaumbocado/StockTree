@@ -1,26 +1,24 @@
-import React, { useState, useEffect, useCallback } from 'react';  // Import React and useCallback
-import { Image, StyleSheet, ScrollView, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Image, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, useColorScheme, View } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import LocationCard from '@/components/LocationCard';
-import { useFocusEffect } from '@react-navigation/native';  // Import useFocusEffect
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen() {
   const [storageLocations, setStorageLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const colorScheme = useColorScheme();  // Get the current theme (light or dark)
 
-  // Fetch locations function
   const fetchLocations = async () => {
     try {
-      setLoading(true); // Start loading when fetching again
+      setLoading(true);
       await loadApiUrl();
       if (!apiUrl) return;
-
-      console.log('Starting fetch request to:', apiUrl);
 
       const params = new URLSearchParams({
         limit: '100',
@@ -73,7 +71,6 @@ export default function HomeScreen() {
     }
   };
 
-  // Load API URL from secure storage
   const loadApiUrl = async () => {
     const storedUrl = await SecureStore.getItemAsync('API_URL');
     if (storedUrl) {
@@ -83,15 +80,20 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchLocations(); // Fetch data when the screen is focused
-    }, [apiUrl]) // Make sure to re-fetch if apiUrl changes
+      fetchLocations();
+    }, [apiUrl])
   );
 
-  // Handle refresh control
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchLocations();
   };
+
+  // Get dynamic background and text colors based on theme
+  const headerBackgroundColor = '#A1E8C5'; // Same green for both light and dark mode
+  const logoBorderColor = colorScheme === 'dark' ? '#A1E8C5' : '#1D3D47'; // Adjust for contrast in dark mode
+  const headerTextColor = colorScheme === 'dark' ? '#fff' : '#1D3D47'; // Light text in dark mode
+  const cardBackgroundColor = colorScheme === 'dark' ? '##fff' : '#F4F9FA'; // Darker background for cards in dark mode
 
   return (
     <ScrollView
@@ -103,23 +105,27 @@ export default function HomeScreen() {
       }
     >
       <ParallaxScrollView
-        headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+        headerBackgroundColor={{ light: headerBackgroundColor, dark: headerBackgroundColor }} // Same green for header in both modes
         headerImage={
-          <Image
-            source={{ uri: 'https://via.placeholder.com/100' }}
-            style={styles.logo}
-          />
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('@/assets/images/fraunhofer.png')}
+              style={[styles.logo, { borderColor: logoBorderColor }]}
+            />
+          </View>
         }
       >
         <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Stock Management</ThemedText>
+          <ThemedText type="title" style={[styles.headerText, { color: headerTextColor }]}>
+            Stock Management
+          </ThemedText>
         </ThemedView>
       </ParallaxScrollView>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#000" style={styles.loader} />
+        <ActivityIndicator size="large" color="#A1E8C5" style={styles.loader} />
       ) : (
-        <ScrollView style={styles.cardContainer}>
+        <ScrollView style={[styles.cardContainer, { backgroundColor: cardBackgroundColor }]}>
           {storageLocations.map(({ id, locationName, capacity, itemsStored, sublocations, locationType }) => (
             <LocationCard
               key={id}
@@ -141,14 +147,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 16,
   },
+  logoContainer: {
+    flex: 1,  // Allow the container to take up available space
+    justifyContent: 'center',  // Vertically center the logo
+    alignItems: 'center',  // Horizontally center the logo
+    minHeight: 120,  // Ensure there's enough space for centering
+  },
   logo: {
-    height: 100,
-    width: 100,
+    height: 120,
+    width: '80%',  // Adjust width to make the logo more prominent horizontally
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 16, // Space below logo
+  },
+  headerText: {
+    fontSize: 28,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   loader: {
     marginTop: 20,
   },
   cardContainer: {
-    padding: 16,
+    padding: 20,
   },
 });
