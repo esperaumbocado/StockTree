@@ -1,29 +1,50 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet, Image, useColorScheme, Pressable } from 'react-native';
+import { Link } from 'expo-router';
 
-const CategoryCard = ({ name, description, partCount, icon }) => {
-  const colorScheme = useColorScheme();  // Get the current color scheme (light or dark)
-
-  // Dynamic styles based on the color scheme
-  const cardBackgroundColor = colorScheme === 'dark' ? '#333' : '#fff';
-  const textColor = colorScheme === 'dark' ? '#fff' : '#333';
-  const descriptionColor = colorScheme === 'dark' ? '#ccc' : '#777';
-  const partCountColor = colorScheme === 'dark' ? '#ddd' : '#333';
+const CategoryCard = ({ name, description, partCount, icon, categoryId }) => {
+  const colorScheme = useColorScheme();
 
   return (
-    <View style={[styles.card, { backgroundColor: cardBackgroundColor }]}>
-      {icon && <Image source={{ uri: icon }} style={styles.icon} />}
-      <Text style={[styles.name, { color: textColor }]}>{name}</Text>
-      <Text style={[styles.description, { color: descriptionColor }]}>{description}</Text>
-      <Text style={[styles.partCount, { color: partCountColor }]}>Parts: {partCount}</Text>
+    <View style={styles.cardContainer}>
+      <Link
+        href={{
+          pathname: `/categoryDetail/${categoryId}`,
+          params: { categoryName: name }, // Pass the category name as a parameter
+        }}
+        asChild
+      >
+        <Pressable>
+          {({ pressed }) => (
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colorScheme === 'dark' ? '#333' : '#fff',
+                  opacity: pressed ? 0.8 : 1,
+                },
+              ]}
+            >
+              {icon && <Image source={{ uri: icon }} style={styles.icon} />}
+              <Text style={[styles.name, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
+              <Text style={[styles.description, { color: colorScheme === 'dark' ? '#ccc' : '#777' }]}>{description}</Text>
+              <Text style={[styles.partCount, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>Parts: {partCount}</Text>
+            </View>
+          )}
+        </Pressable>
+      </Link>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  cardContainer: {
+    marginVertical: 8,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
   card: {
     padding: 16,
-    marginVertical: 8,
     borderRadius: 8,
     elevation: 2,
     shadowColor: '#000',
