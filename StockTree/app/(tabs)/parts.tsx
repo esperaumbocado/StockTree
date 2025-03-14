@@ -3,18 +3,16 @@ import { Image, StyleSheet, ScrollView, ActivityIndicator, Button } from 'react-
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import LocationCard from '@/components/LocationCard';
-import { useRouter } from 'expo-router';
+import { PartCard } from '@/components/PartCard';
 
-const API_URL = 'http://inventree.localhost/api/stock/location/';
+const API_URL = 'http://inventree.localhost/api/part/';
 
-export default function HomeScreen() {
-  const router = useRouter();
-  const [storageLocations, setStorageLocations] = useState([]);
+export default function PartScreen() {
+  const [storageParts, setStorageParts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLocations = async () => {
+    const fetchParts = async () => {
       try {
         console.log('Starting fetch request to:', API_URL);
 
@@ -29,7 +27,7 @@ export default function HomeScreen() {
           method: 'GET',
           headers: {
             'Authorization': 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
-            // 'Content-Application': 'application/json',
+            //'Content-Application': 'application/json',
             'Accept': 'application/json',
             'Connection': 'keep-alive',
             'Host': 'inventree.localhost',
@@ -61,16 +59,13 @@ export default function HomeScreen() {
 
         console.log('Fetched data:', data);
 
-        const locations = data.results.map(item => ({
+        const parts = data.results.map(item => ({
           id: item.pk,                          // Mapping pk to id
-          locationName: item.name || 'Unknown',  // Using name for location name
-          capacity: item.items,                 // Using items as capacity
-          itemsStored: item.tags.length || 0,    // Counting tags for items stored
-          sublocations: item.sublocations,      // Using sublocations as needed
-          locationType: item.location_type,     // Optionally map location_type
+          name: item.name || 'Unknown',  // Using name for location name
+          stock: item.in_stock,                 // Using items as capacity
         }));
 
-        setStorageLocations(locations);
+        setStorageParts(parts);
       } catch (error) {
         console.error('Error fetching storage locations:', error.message);
       } finally {
@@ -78,7 +73,7 @@ export default function HomeScreen() {
       }
     };
 
-    fetchLocations();
+    fetchParts();
   }, []);
 
   return (
@@ -94,20 +89,16 @@ export default function HomeScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Stock Management</ThemedText>
       </ThemedView>
-        <Button title="Go to parts" onPress={() => router.push('/parts')} />
-        <Button title="Go to Search" onPress={() => router.push('/search')} />
+
       {loading ? (
         <ActivityIndicator size="large" color="#000" style={styles.loader} />
       ) : (
         <ScrollView style={styles.cardContainer}>
-          {storageLocations.map(({ id, locationName, capacity, itemsStored, sublocations, locationType }) => (
-            <LocationCard
+          {storageParts.map(({ id, name, stock}) => (
+            <PartCard
               key={id}
-              locationName={locationName}
-              capacity={capacity}
-              itemsStored={itemsStored}
-              sublocations={sublocations}
-              locationType={locationType}
+              name={name}
+              stock={stock}
             />
           ))}
         </ScrollView>
