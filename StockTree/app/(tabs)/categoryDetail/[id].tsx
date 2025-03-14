@@ -6,11 +6,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CategoryCard from '@/components/CategoryCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { PartCard } from '@/components/PartCard'; // Import PartCard component
 
 export default function DetailsScreen() {
   const { id, categoryName } = useLocalSearchParams(); // Get the category ID and name from params
   const colorScheme = useColorScheme();
   const [subcategories, setSubcategories] = useState([]);
+  const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState(''); // Define apiUrl state
 
@@ -25,12 +27,79 @@ export default function DetailsScreen() {
       }
 
       if (storedUrl) {
-        setApiUrl(`${storedUrl}/api/part/category`);
+        setApiUrl(`${storedUrl}`);
       } else {
         console.error('API URL not found in storage.');
       }
     } catch (error) {
       console.error('Error loading API URL:', error.message);
+    }
+  };
+
+  const fetchParts = async () => {
+    try {
+      setLoading(true);
+      await loadApiUrl();
+      if (!apiUrl) return;
+
+      const params = new URLSearchParams({
+        category: id,
+      });
+
+      console.log('Request Params (Parts): ', params.toString());
+
+      const apiEndpoint = `${apiUrl}/api/part/?${params.toString()}`;
+      console.log('API ENDPOINT (Parts): ', apiEndpoint);
+      const response = await fetch(apiEndpoint, {
+        method: 'GET',
+        headers: {
+          Authorization: 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
+          Accept: 'application/json',
+          Connection: 'keep-alive',
+          Host: 'inventree.localhost',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status (Parts): ${response.status}`);
+      }
+
+      const rawData = await response.text();
+      console.log('Raw Response (Parts):', rawData); // Log the raw response
+
+      let data;
+      try {
+        data = JSON.parse(rawData);
+      } catch (e) {
+        throw new Error('Error parsing JSON response (Parts): ' + e.message);
+      }
+
+      console.log("Parsed Data (Parts): ", data); // Log the parsed data
+
+      let fetchedParts;
+      if (Array.isArray(data)) {
+        fetchedParts = data.map((item) => ({
+          id: item.pk,
+          name: item.name,
+          description: item.description,
+          stock: item.in_stock,
+        }));
+      } else {
+        fetchedParts = [
+          {
+            id: data.pk,
+            name: data.name,
+            description: data.description,
+            stock: data.in_stock,
+          },
+        ];
+      }
+
+      setParts(fetchedParts); // Set the fetched parts
+    } catch (error) {
+      console.error('Error fetching parts:', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,10 +124,10 @@ export default function DetailsScreen() {
 
       console.log('Request Params:', params.toString());
 
-      const apiEndpoint = `${apiUrl}/?${params.toString()}`;
+      const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;
 
       console.log('Request Headers:', {
-        Authorization: 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
+        Authorization: 'Token inv-2b62c677a3a95b74f349b351333f097472f97f60-20250314',
         Accept: 'application/json',
         Connection: 'keep-alive',
         Host: 'inventree.localhost',
@@ -114,7 +183,7 @@ export default function DetailsScreen() {
         ];
       }
 
-      setSubcategories(fetchedSubcategories);
+      setSubcategories(fetchedSubcategories); // Set the fetched subcategories
     } catch (error) {
       console.error('Error fetching subcategories:', error.message);
     } finally {
@@ -127,10 +196,11 @@ export default function DetailsScreen() {
     loadApiUrl();
   }, []);
 
-  // Fetch subcategories when apiUrl or category ID changes
+  // Fetch subcategories and parts when apiUrl or category ID changes
   useEffect(() => {
     if (apiUrl) {
       fetchSubcategories();
+      fetchParts();
     }
   }, [apiUrl, id]);
 
@@ -147,18 +217,37 @@ export default function DetailsScreen() {
       ) : (
         <View style={styles.categoryContainer}>
           {subcategories.length > 0 ? (
-            subcategories.map(({ id, name, description, partCount, icon }) => (
-              <CategoryCard
-                key={id}
-                name={name}
-                description={description}
-                partCount={partCount}
-                icon={icon}
-                categoryId={id} // Pass the subcategory ID to the card
-              />
-            ))
+            <View>
+              <ThemedText style={styles.subcategoryHeader}>Subcategories</ThemedText>
+              {subcategories.map(({ id, name, description, partCount, icon }) => (
+                <CategoryCard
+                  key={id}
+                  name={name}
+                  description={description}
+                  partCount={partCount}
+                  icon={icon}
+                  categoryId={id} // Pass the subcategory ID to the card
+                />
+              ))}
+            </View>
           ) : (
             <ThemedText style={styles.noResults}>No subcategories found.</ThemedText>
+          )}
+
+          {parts.length > 0 ? (
+            <View>
+              <ThemedText style={styles.partsHeader}>Parts</ThemedText>
+              {parts.map(({ id, name, description, stock }) => (
+                <PartCard
+                  key={id}
+                  name={name}
+                  stock={stock}
+                  imageUrl={description} // Use imageUrl as per your logic
+                />
+              ))}
+            </View>
+          ) : (
+            <ThemedText style={styles.noResults}>No parts found.</ThemedText>
           )}
         </View>
       )}
@@ -182,9 +271,21 @@ const styles = StyleSheet.create({
   categoryContainer: {
     padding: 16,
   },
+  subcategoryHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  partsHeader: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 10,
+  },
   noResults: {
     textAlign: 'center',
     fontSize: 16,
     marginTop: 20,
   },
 });
+

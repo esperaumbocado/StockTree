@@ -58,7 +58,7 @@ export default function TabLayout() {
                 tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
               }}
             />
-
     </Tabs>
+
   );
 }
