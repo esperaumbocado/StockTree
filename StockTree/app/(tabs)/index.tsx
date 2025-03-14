@@ -1,14 +1,20 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image, Platform } from 'react-native';
+import { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image, Button, Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import LocationCard from '@/components/LocationCard';
 import CategoryCard from '@/components/CategoryCard';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+
+const API_URL = 'http://inventree.localhost/api/stock/location/';
 
 export default function HomeScreen({ navigation }) {
+  const router = useRouter(); // ✅ Define router
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState('');
@@ -29,7 +35,7 @@ export default function HomeScreen({ navigation }) {
       const response = await fetch(`${apiUrl}/?${params.toString()}`, {
         method: 'GET',
         headers: {
-          'Authorization': 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
+          'Authorization': 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
           'Accept': 'application/json',
           'Connection': 'keep-alive',
           'Host': 'inventree.localhost',
@@ -96,47 +102,47 @@ export default function HomeScreen({ navigation }) {
   );
 
   return (
-    <ScrollView
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
-      <ParallaxScrollView
-        headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
-        contentBackgroundColor="white"
-        headerImage={
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('@/assets/images/fraunhofer.png')}
-              style={styles.logo}
-            />
-          </View>
-        }
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>
-            Categories
-          </ThemedText>
-        </ThemedView>
-      </ParallaxScrollView>
+        <ParallaxScrollView
+          headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
+          contentBackgroundColor="white"
+          headerImage={
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('@/assets/images/fraunhofer.png')}
+                style={styles.logo}
+              />
+            </View>
+          }
+        >
+          <ThemedView style={styles.titleContainer}>
+            <ThemedText type="title" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>
+              Categories
+            </ThemedText>
+          </ThemedView>
+        </ParallaxScrollView>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#A1E8C5" style={styles.loader} />
-      ) : (
-        <View style={styles.categoryContainer}>
-          {categories.map(({ id, name, description, partCount, icon }) => (
-            <CategoryCard
-              key={id}
-              name={name}
-              description={description}
-              partCount={partCount}
-              icon={icon}
-              navigation={navigation} // Pass navigation to CategoryCard
-              categoryId={id} // Pass the category ID to the card
-            />
-          ))}
-        </View>
-      )}
-    </ScrollView>
-  );
+        {loading ? (
+          <ActivityIndicator size="large" color="#A1E8C5" style={styles.loader} />
+        ) : (
+          <View style={styles.categoryContainer}>
+            {categories.map(({ id, name, description, partCount, icon }) => (
+              <CategoryCard
+                key={id}
+                name={name}
+                description={description}
+                partCount={partCount}
+                icon={icon}
+                navigation={navigation} // Pass navigation to CategoryCard
+                categoryId={id} // Pass the category ID to the card
+              />
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    );
 }
 
 const styles = StyleSheet.create({
