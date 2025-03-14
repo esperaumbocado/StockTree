@@ -1,17 +1,29 @@
 import React from "react";
 import { View, Text, StyleSheet, useColorScheme, Pressable} from "react-native";
-import { Card } from "react-native-paper";
+import { Link } from 'expo-router';
 
-const PartCard = ({ name, stock, imageUrl}) => {
+const PartCard = ({name, stock, imageUrl, partId}) => {
       const colorScheme = useColorScheme();
 
   return (
     <View style={styles.cardContainer}>
-      <View style={[styles.card, {backgroundColor: colorScheme === 'dark' ? '#333' : '#fff', opacity: 1,},]}>
+    <Link
+            href={{
+              pathname: `/partDetail/${partId}`,
+              params: { partName: name }, // Pass the category name as a parameter
+            }}
+            asChild
+          >
+          <Pressable>
+                    {({ pressed }) => (
+                      <View style={[styles.card, {backgroundColor: colorScheme === 'dark' ? '#333' : '#fff', opacity: pressed ? 0.8 : 1,},]}>
+
         <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
         <Text style={[styles.details , { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>In stock: {stock}</Text>
 
-      </View>
+            </View>)}
+        </Pressable>
+      </Link>
     </View>
   );
 };
