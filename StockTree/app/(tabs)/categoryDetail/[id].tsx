@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CategoryCard from '@/components/CategoryCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -13,14 +14,20 @@ export default function DetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState(''); // Define apiUrl state
 
-  // Load the API URL from SecureStore
+  // Load the API URL from SecureStore or AsyncStorage depending on the platform
   const loadApiUrl = async () => {
     try {
-      const storedUrl = await SecureStore.getItemAsync('API_URL');
+      let storedUrl;
+      if (Platform.OS === 'web') {
+        storedUrl = await AsyncStorage.getItem('API_URL');
+      } else {
+        storedUrl = await SecureStore.getItemAsync('API_URL');
+      }
+
       if (storedUrl) {
         setApiUrl(`${storedUrl}/api/part/category`);
       } else {
-        console.error('API URL not found in SecureStore.');
+        console.error('API URL not found in storage.');
       }
     } catch (error) {
       console.error('Error loading API URL:', error.message);
