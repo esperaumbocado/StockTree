@@ -53,7 +53,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
+          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -127,7 +127,7 @@ export default function DetailsScreen() {
       const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;
 
       console.log('Request Headers:', {
-        Authorization: 'Token inv-2b62c677a3a95b74f349b351333f097472f97f60-20250314',
+        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
         Accept: 'application/json',
         Connection: 'keep-alive',
         Host: 'inventree.localhost',
@@ -136,7 +136,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
+          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -237,12 +237,13 @@ export default function DetailsScreen() {
           {parts.length > 0 ? (
             <View>
               <ThemedText style={styles.partsHeader}>Parts</ThemedText>
-              {parts.map(({ id, name, description, stock }) => (
+              {parts.map(({ id, name, description, stock, partId }) => (
                 <PartCard
                   key={id}
                   name={name}
                   stock={stock}
                   imageUrl={description} // Use imageUrl as per your logic
+                  partId={id}
                 />
               ))}
             </View>
