@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput } from 'react-native';
+import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PartCard } from '@/components/PartCard';
-
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const API_URL = 'http://inventree.localhost/api/part/';
-
+const BASE_URL = 'http://inventree.localhost/'
 const SearchPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -15,17 +15,20 @@ const SearchPage: React.FC = () => {
 
   // Fetch search results from API
   const handleSearch = async (text: string) => {
-    setSearchQuery(text);
-    
-    if (text.length < 2) {
-      setResults([]); // Clear results if input is too short
-      return;
-    }
+      setSearchQuery(text);
+      }
+  const handleSearchButtonPress = async (text: string) => {
+
     console.log('search status:', searchQuery);
+    /*
     const params = new URLSearchParams({
               search: searchQuery,
             });
+        */
+    const params = new URLSearchParams();
+    params.append('search', searchQuery);
 
+    console.log('TEST:', params.toString());
     setLoading(true);
     try {
       const response = await fetch(`${API_URL}?${params.toString()}`, {
@@ -36,7 +39,7 @@ const SearchPage: React.FC = () => {
               'Accept': 'application/json',
               'Connection': 'keep-alive',
               'Host': 'inventree.localhost',
-              'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0',
+
             },
 
         });
@@ -57,6 +60,8 @@ const SearchPage: React.FC = () => {
                 id: item.pk,                          // Mapping pk to id
                 name: item.name || 'Unknown',  // Using name for location name
                 stock: item.in_stock,                 // Using stock for showing available stock
+                image: item.image ? `${BASE_URL}${item.image}` : null, // ImageURL
+
 
       }));
 
@@ -81,21 +86,26 @@ const SearchPage: React.FC = () => {
           <ThemedView style={styles.titleContainer}>
             <ThemedText type="title">Stock Management</ThemedText>
           </ThemedView>
+
             <TextInput
                     style={styles.searchBar}
                     placeholder="Search items..."
                     value={searchQuery}
                     onChangeText={handleSearch}
                   />
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearchButtonPress}>
+                    <Icon name="search" size={20} color="#fff" />
+            </TouchableOpacity>
           {loading ? (
             <ActivityIndicator size="large" color="#000" style={styles.loader} />
           ) : (
             <ScrollView style={styles.cardContainer}>
-              {results.map(({ id, name, stock}) => (
+              {results.map(({ id, name, stock, image}) => (
                 <PartCard
                   key={id}
                   name={name}
                   stock={stock}
+                  image={image}
 
                 />
               ))}

@@ -1,13 +1,18 @@
 import React from "react";
-import { View, Text, StyleSheet} from "react-native";
+import { View, Text, StyleSheet, Image} from "react-native";
 import { Card } from "react-native-paper";
+import ImageCard from './ImageCard';
 
-const PartCard = ({ name, stock, imageUrl}) => {
+const PartCard = ({ name, stock, image}) => {
   return (
     <Card style={styles.card}>
       <Card.Content>
         <Text style={styles.title}>{name}</Text>
         <Text style={styles.details}>In stock: {stock}</Text>
+        <ImageCard
+            imageLink = {image}
+            token = "inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305"
+        />
 
       </Card.Content>
     </Card>
