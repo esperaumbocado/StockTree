@@ -53,7 +53,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
+          Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -82,6 +82,7 @@ export default function DetailsScreen() {
           id: item.pk,
           name: item.name,
           description: item.description,
+          image: item.image ? `http://inventree.localhost/${item.image}` : null,  // CHANGE THIS LATER!!!!!!!
           stock: item.in_stock,
         }));
       } else {
@@ -90,6 +91,7 @@ export default function DetailsScreen() {
             id: data.pk,
             name: data.name,
             description: data.description,
+            image: data.image ? `http://inventree.localhost/${data.image}` : null,  // CHANGE THIS LATER!!!!!!!
             stock: data.in_stock,
           },
         ];
@@ -127,7 +129,7 @@ export default function DetailsScreen() {
       const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;
 
       console.log('Request Headers:', {
-        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
+        Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
         Accept: 'application/json',
         Connection: 'keep-alive',
         Host: 'inventree.localhost',
@@ -136,7 +138,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
+          Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -237,12 +239,13 @@ export default function DetailsScreen() {
           {parts.length > 0 ? (
             <View>
               <ThemedText style={styles.partsHeader}>Parts</ThemedText>
-              {parts.map(({ id, name, description, stock, partId }) => (
+              {parts.map(({ id, name, description, image, stock, partId }) => (
                 <PartCard
                   key={id}
                   name={name}
                   stock={stock}
-                  imageUrl={description} // Use imageUrl as per your logic
+                  image={image}
+                  //description={description} // Use imageUrl as per your logic
                   partId={id}
                 />
               ))}

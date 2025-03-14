@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet, useColorScheme, Pressable} from "react-native";
+import { Card } from "react-native-paper";
+import ImageCard from './ImageCard';
 import { Link } from 'expo-router';
 
-const PartCard = ({name, stock, imageUrl, partId}) => {
+const PartCard = ({name, stock, image, partId}) => {
       const colorScheme = useColorScheme();
 
   return (
@@ -21,6 +23,10 @@ const PartCard = ({name, stock, imageUrl, partId}) => {
         <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
         <Text style={[styles.details , { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>In stock: {stock}</Text>
 
+        <ImageCard
+                    imageLink = {image}
+                    token = "inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305"
+                />
             </View>)}
         </Pressable>
       </Link>
