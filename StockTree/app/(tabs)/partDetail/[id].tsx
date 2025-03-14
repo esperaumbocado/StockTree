@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, 
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import PartCard from '@/components/CategoryCard';
+import ImageCard from '@/components/ImageCard';
+
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -55,7 +56,7 @@ export default function DetailsScreen() {
       const apiEndpoint = `${apiUrl}/${id}/`;
 
       console.log('Request Headers:', {
-        Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
         Accept: 'application/json',
         Connection: 'keep-alive',
         Host: 'inventree.localhost',
@@ -64,7 +65,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -95,6 +96,7 @@ export default function DetailsScreen() {
             name: data.name,
             description: data.description,
             stock: data.in_stock,
+            image: data.image ? `http://inventree.localhost/${data.image}` : null,
           };
 
       console.log('FetchedPart', fetchedPart);
@@ -136,7 +138,13 @@ export default function DetailsScreen() {
               <>
                     <Text style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>Description: {part.description}</Text>
                     <Text style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>Stock: {part.stock}</Text>
-                  </>
+
+
+            <ImageCard
+              imageLink = {part.image}
+              token = "inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228"
+            />
+            </>
             ) : (
               <ThemedText style={styles.noResults}>No Part found.</ThemedText>
             )}

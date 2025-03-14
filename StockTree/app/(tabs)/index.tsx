@@ -34,7 +34,7 @@ export default function HomeScreen({ navigation }) {
       const response = await fetch(`${apiUrl}/api/part/category/?${params.toString()}`, {
         method: 'GET',
         headers: {
-          'Authorization': 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+          'Authorization': 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
           'Accept': 'application/json',
           'Connection': 'keep-alive',
           'Host': 'inventree.localhost',
