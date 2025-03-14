@@ -37,13 +37,25 @@ export default function DetailsScreen() {
         return;
       }
 
+      console.log('API URL:', apiUrl);
+
       const params = new URLSearchParams({
         parent: id,
-        cascade: false,
+        cascade: true,
         ordering: 'name',
+        depth: 1,
       });
 
+      console.log('Request Params:', params.toString());
+
       const apiEndpoint = `${apiUrl}/?${params.toString()}`;
+
+      console.log('Request Headers:', {
+        Authorization: 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
+        Accept: 'application/json',
+        Connection: 'keep-alive',
+        Host: 'inventree.localhost',
+      });
 
       const response = await fetch(apiEndpoint, {
         method: 'GET',
@@ -60,6 +72,8 @@ export default function DetailsScreen() {
       }
 
       const rawData = await response.text();
+      console.log('Raw Response:', rawData); // Log the raw response
+
       let data;
       try {
         data = JSON.parse(rawData);
@@ -67,13 +81,31 @@ export default function DetailsScreen() {
         throw new Error('Error parsing JSON response: ' + e.message);
       }
 
-      const fetchedSubcategories = data.map((item) => ({
-        id: item.pk,
-        name: item.name,
-        description: item.description,
-        partCount: item.part_count,
-        icon: item.icon,
-      }));
+      console.log('Parsed Data:', data); // Log the parsed data
+
+      // Handle both array and object responses
+      let fetchedSubcategories;
+      if (Array.isArray(data)) {
+        // If the response is an array, map it directly
+        fetchedSubcategories = data.map((item) => ({
+          id: item.pk,
+          name: item.name,
+          description: item.description,
+          partCount: item.part_count,
+          icon: item.icon,
+        }));
+      } else {
+        // If the response is a single object, wrap it in an array
+        fetchedSubcategories = [
+          {
+            id: data.pk,
+            name: data.name,
+            description: data.description,
+            partCount: data.part_count,
+            icon: data.icon,
+          },
+        ];
+      }
 
       setSubcategories(fetchedSubcategories);
     } catch (error) {
