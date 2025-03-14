@@ -1,7 +1,8 @@
 
-import { useEffect, useState, useCallback } from 'react';
-import { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image, Button } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image, Button, Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -71,10 +72,21 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  // Load the API URL from storage (SecureStore for mobile, AsyncStorage for web)
   const loadApiUrl = async () => {
-    const storedUrl = await SecureStore.getItemAsync('API_URL');
-    if (storedUrl) {
-      setApiUrl(`${storedUrl}/api/part/category`);
+    try {
+      let storedUrl;
+      if (Platform.OS === 'web') {
+        storedUrl = await AsyncStorage.getItem('API_URL');
+      } else {
+        storedUrl = await SecureStore.getItemAsync('API_URL');
+      }
+
+      if (storedUrl) {
+        setApiUrl(`${storedUrl}/api/part/category`);
+      }
+    } catch (error) {
+      console.error('Error loading API URL:', error);
     }
   };
 

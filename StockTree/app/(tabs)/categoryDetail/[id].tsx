@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CategoryCard from '@/components/CategoryCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -13,14 +14,20 @@ export default function DetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState(''); // Define apiUrl state
 
-  // Load the API URL from SecureStore
+  // Load the API URL from SecureStore or AsyncStorage depending on the platform
   const loadApiUrl = async () => {
     try {
-      const storedUrl = await SecureStore.getItemAsync('API_URL');
+      let storedUrl;
+      if (Platform.OS === 'web') {
+        storedUrl = await AsyncStorage.getItem('API_URL');
+      } else {
+        storedUrl = await SecureStore.getItemAsync('API_URL');
+      }
+
       if (storedUrl) {
         setApiUrl(`${storedUrl}/api/part/category`);
       } else {
-        console.error('API URL not found in SecureStore.');
+        console.error('API URL not found in storage.');
       }
     } catch (error) {
       console.error('Error loading API URL:', error.message);
@@ -37,13 +44,25 @@ export default function DetailsScreen() {
         return;
       }
 
+      console.log('API URL:', apiUrl);
+
       const params = new URLSearchParams({
         parent: id,
-        cascade: false,
+        cascade: true,
         ordering: 'name',
+        depth: 1,
       });
 
+      console.log('Request Params:', params.toString());
+
       const apiEndpoint = `${apiUrl}/?${params.toString()}`;
+
+      console.log('Request Headers:', {
+        Authorization: 'Token inv-969802229ef25a65ede9ab5248af5eb3be0b7d2f-20250227',
+        Accept: 'application/json',
+        Connection: 'keep-alive',
+        Host: 'inventree.localhost',
+      });
 
       const response = await fetch(apiEndpoint, {
         method: 'GET',
@@ -60,6 +79,8 @@ export default function DetailsScreen() {
       }
 
       const rawData = await response.text();
+      console.log('Raw Response:', rawData); // Log the raw response
+
       let data;
       try {
         data = JSON.parse(rawData);
@@ -67,13 +88,31 @@ export default function DetailsScreen() {
         throw new Error('Error parsing JSON response: ' + e.message);
       }
 
-      const fetchedSubcategories = data.map((item) => ({
-        id: item.pk,
-        name: item.name,
-        description: item.description,
-        partCount: item.part_count,
-        icon: item.icon,
-      }));
+      console.log('Parsed Data:', data); // Log the parsed data
+
+      // Handle both array and object responses
+      let fetchedSubcategories;
+      if (Array.isArray(data)) {
+        // If the response is an array, map it directly
+        fetchedSubcategories = data.map((item) => ({
+          id: item.pk,
+          name: item.name,
+          description: item.description,
+          partCount: item.part_count,
+          icon: item.icon,
+        }));
+      } else {
+        // If the response is a single object, wrap it in an array
+        fetchedSubcategories = [
+          {
+            id: data.pk,
+            name: data.name,
+            description: data.description,
+            partCount: data.part_count,
+            icon: data.icon,
+          },
+        ];
+      }
 
       setSubcategories(fetchedSubcategories);
     } catch (error) {

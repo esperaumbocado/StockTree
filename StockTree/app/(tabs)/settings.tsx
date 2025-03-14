@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, useColorScheme } from 'react-native';
+import { View, Text, TextInput, Button, Alert, StyleSheet, useColorScheme, Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
   const [apiUrl, setApiUrl] = useState('');
@@ -9,18 +10,42 @@ export default function SettingsScreen() {
   // Load API URL when the screen opens
   useEffect(() => {
     const loadApiUrl = async () => {
-      const storedUrl = await SecureStore.getItemAsync('API_URL');
+      const storedUrl = await getApiUrl();
       if (storedUrl) setApiUrl(storedUrl);
     };
     loadApiUrl();
   }, []);
 
+  // Save API URL based on platform
   const saveApiUrl = async () => {
     try {
-      await SecureStore.setItemAsync('API_URL', apiUrl);
+      await saveApiUrlToStorage('API_URL', apiUrl);
       Alert.alert('Success', 'API URL saved!');
     } catch (error) {
       Alert.alert('Error', 'Failed to save API URL.');
+    }
+  };
+
+  // Save API URL to storage (asyncStorage for web, secureStore for mobile)
+  const saveApiUrlToStorage = async (key: string, value: string) => {
+    if (Platform.OS === 'web') {
+      await AsyncStorage.setItem(key, value);
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  };
+
+  // Get API URL from storage (asyncStorage for web, secureStore for mobile)
+  const getApiUrl = async () => {
+    try {
+      if (Platform.OS === 'web') {
+        return await AsyncStorage.getItem('API_URL');
+      } else {
+        return await SecureStore.getItemAsync('API_URL');
+      }
+    } catch (error) {
+      console.error('Error retrieving data:', error);
+      return null;
     }
   };
 
