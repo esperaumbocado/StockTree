@@ -34,7 +34,7 @@ export default function DetailsScreen() {
     }
   };
 
-  // Fetch subcategories of the current category
+  // Fetch the part selected
   const fetchPart = async () => {
     try {
       setLoading(true);
@@ -89,19 +89,18 @@ export default function DetailsScreen() {
 
       // Handle both array and object responses
       let fetchedPart;
-        fetchedPart = [
+        fetchedPart =
           {
             id: data.pk,
             name: data.name,
             description: data.description,
             stock: data.in_stock,
-          },
-        ];
+          };
 
       console.log('FetchedPart', fetchedPart);
       setPart(fetchedPart);
     } catch (error) {
-      console.error('Error fetching subcategories:', error.message);
+      console.error('Error fetching part:', error.message);
     } finally {
       setLoading(false);
     }
@@ -133,17 +132,14 @@ export default function DetailsScreen() {
         <ActivityIndicator size="large" color="#A1E8C5" style={styles.loader} />
       ) : (
         <View style={styles.categoryContainer}>
-          {part.length > 0 ? (
-            part.map(({ id, name, description, stock, icon }) => (
-              <PartCard
-                key={id}
-                name={name}
-                stock={stock}
-              />
-            ))
-          ) : (
-            <ThemedText style={styles.noResults}>No Part found.</ThemedText>
-          )}
+          {part ? (
+              <>
+                    <Text style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>Description: {part.description}</Text>
+                    <Text style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>Stock: {part.stock}</Text>
+                  </>
+            ) : (
+              <ThemedText style={styles.noResults}>No Part found.</ThemedText>
+            )}
         </View>
       )}
     </ScrollView>
