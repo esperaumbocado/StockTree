@@ -1,7 +1,8 @@
 
-import { useEffect, useState, useCallback } from 'react';
-import { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image, Button } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image, Button, Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -10,7 +11,6 @@ import CategoryCard from '@/components/CategoryCard';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 
-const API_URL = 'http://inventree.localhost/api/stock/location/';
 
 export default function HomeScreen({ navigation }) {
   const router = useRouter(); // ✅ Define router
@@ -31,7 +31,7 @@ export default function HomeScreen({ navigation }) {
         ordering: 'name',
       });
 
-      const response = await fetch(`${apiUrl}/?${params.toString()}`, {
+      const response = await fetch(`${apiUrl}/api/part/category/?${params.toString()}`, {
         method: 'GET',
         headers: {
           'Authorization': 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
@@ -71,10 +71,21 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  // Load the API URL from storage (SecureStore for mobile, AsyncStorage for web)
   const loadApiUrl = async () => {
-    const storedUrl = await SecureStore.getItemAsync('API_URL');
-    if (storedUrl) {
-      setApiUrl(`${storedUrl}/api/part/category`);
+    try {
+      let storedUrl;
+      if (Platform.OS === 'web') {
+        storedUrl = await AsyncStorage.getItem('API_URL');
+      } else {
+        storedUrl = await SecureStore.getItemAsync('API_URL');
+      }
+
+      if (storedUrl) {
+        setApiUrl(`${storedUrl}`);
+      }
+    } catch (error) {
+      console.error('Error loading API URL:', error);
     }
   };
 
