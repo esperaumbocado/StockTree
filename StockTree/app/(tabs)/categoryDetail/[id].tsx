@@ -53,7 +53,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
+          Authorization: 'Token inv-58ee10118c2d54e3fdf307b5da82430a9de96205-20250321',
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -65,7 +65,7 @@ export default function DetailsScreen() {
       }
 
       const rawData = await response.text();
-      console.log('Raw Response (Parts):', rawData); // Log the raw response
+      console.log('Raw Response (Parts):', rawData);
 
       let data;
       try {
@@ -74,36 +74,42 @@ export default function DetailsScreen() {
         throw new Error('Error parsing JSON response (Parts): ' + e.message);
       }
 
-      console.log("Parsed Data (Parts): ", data); // Log the parsed data
+      console.log("Parsed Data (Parts): ", data);
 
       let fetchedParts;
       if (Array.isArray(data)) {
-        fetchedParts = data.map((item) => ({
-          id: item.pk,
-          name: item.name,
-          description: item.description,
-          image: item.image ? `http://inventree.localhost/${item.image}` : null,  // CHANGE THIS LATER!!!!!!!
-          stock: item.in_stock,
-        }));
+        fetchedParts = data.map((item) => {
+          const imageUrl = item.image ? `${apiUrl}${item.image}` : null;
+          return {
+            id: item.pk,
+            name: item.name,
+            description: item.description,
+            image: imageUrl,
+            stock: item.in_stock,
+          };
+        });
       } else {
+        const imageUrl = data.image ? `${apiUrl}${data.image}` : null;
         fetchedParts = [
           {
             id: data.pk,
             name: data.name,
             description: data.description,
-            image: data.image ? `http://inventree.localhost/${data.image}` : null,  // CHANGE THIS LATER!!!!!!!
+            image: imageUrl,
             stock: data.in_stock,
           },
         ];
       }
 
-      setParts(fetchedParts); // Set the fetched parts
+      setParts(fetchedParts);
     } catch (error) {
       console.error('Error fetching parts:', error.message);
     } finally {
       setLoading(false);
     }
   };
+
+
 
   // Fetch subcategories of the current category
   const fetchSubcategories = async () => {
@@ -129,7 +135,7 @@ export default function DetailsScreen() {
       const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;
 
       console.log('Request Headers:', {
-        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
+        Authorization: 'Token inv-58ee10118c2d54e3fdf307b5da82430a9de96205-20250321',
         Accept: 'application/json',
         Connection: 'keep-alive',
         Host: 'inventree.localhost',
@@ -138,7 +144,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
+          Authorization: 'Token inv-58ee10118c2d54e3fdf307b5da82430a9de96205-20250321',
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
