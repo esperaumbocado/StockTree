@@ -65,7 +65,7 @@ export default function DetailsScreen() {
       }
 
       const rawData = await response.text();
-      console.log('Raw Response (Parts):', rawData); // Log the raw response
+      console.log('Raw Response (Parts):', rawData);
 
       let data;
       try {
@@ -74,36 +74,42 @@ export default function DetailsScreen() {
         throw new Error('Error parsing JSON response (Parts): ' + e.message);
       }
 
-      console.log("Parsed Data (Parts): ", data); // Log the parsed data
+      console.log("Parsed Data (Parts): ", data);
 
       let fetchedParts;
       if (Array.isArray(data)) {
-        fetchedParts = data.map((item) => ({
-          id: item.pk,
-          name: item.name,
-          description: item.description,
-          image: item.image ? `http://inventree.localhost/${item.image}` : null,  // CHANGE THIS LATER!!!!!!!
-          stock: item.in_stock,
-        }));
+        fetchedParts = data.map((item) => {
+          const imageUrl = item.image ? `${apiUrl}${item.image}` : null;
+          return {
+            id: item.pk,
+            name: item.name,
+            description: item.description,
+            image: imageUrl,
+            stock: item.in_stock,
+          };
+        });
       } else {
+        const imageUrl = data.image ? `${apiUrl}${data.image}` : null;
         fetchedParts = [
           {
             id: data.pk,
             name: data.name,
             description: data.description,
-            image: data.image ? `http://inventree.localhost/${data.image}` : null,  // CHANGE THIS LATER!!!!!!!
+            image: imageUrl,
             stock: data.in_stock,
           },
         ];
       }
 
-      setParts(fetchedParts); // Set the fetched parts
+      setParts(fetchedParts);
     } catch (error) {
       console.error('Error fetching parts:', error.message);
     } finally {
       setLoading(false);
     }
   };
+
+
 
   // Fetch subcategories of the current category
   const fetchSubcategories = async () => {

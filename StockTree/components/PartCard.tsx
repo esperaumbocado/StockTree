@@ -25,7 +25,6 @@ const PartCard = ({name, stock, image, partId}) => {
 
         <ImageCard
                     imageLink = {image}
-                    token = "inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305"
                 />
             </View>)}
         </Pressable>
