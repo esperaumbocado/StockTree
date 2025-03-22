@@ -34,7 +34,7 @@ const SearchPage: React.FC = () => {
       const response = await fetch(`${API_URL}?${params.toString()}`, {
             method: 'GET',
             headers: {
-              'Authorization': 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
+              'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
               //'Content-Type': 'application/json',
               'Accept': 'application/json',
               'Connection': 'keep-alive',
