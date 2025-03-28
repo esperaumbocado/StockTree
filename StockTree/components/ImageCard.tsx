@@ -11,7 +11,7 @@ const ImageCard = ({ imageLink, token }) => {
             source={{
               uri: imageLink,
               headers: {
-                Authorization: `Token inv-58ee10118c2d54e3fdf307b5da82430a9de96205-20250321`,
+                Authorization: `Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321`,
               },
             }}
             style={styles.image}

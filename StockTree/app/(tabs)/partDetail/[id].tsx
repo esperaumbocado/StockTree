@@ -47,7 +47,7 @@ export default function DetailsScreen() {
         const response = await fetch(apiEndpoint, {
           method: 'GET',
           headers: {
-            Authorization: 'Token inv-58ee10118c2d54e3fdf307b5da82430a9de96205-20250321',
+            Authorization: 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
             Accept: 'application/json',
             Connection: 'keep-alive',
             Host: 'inventree.localhost',
@@ -101,7 +101,7 @@ export default function DetailsScreen() {
               </Text>
               <ImageCard
                 imageLink={part.image}
-                token="inv-58ee10118c2d54e3fdf307b5da82430a9de96205-20250321"
+                token="inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321"
               />
             </>
           ) : (
