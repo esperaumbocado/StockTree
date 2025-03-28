@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform, TouchableOpacity, Modal } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +14,8 @@ export default function DetailsScreen() {
   const [part, setPart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState('');
+  const [counter, setCounter] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const loadApiUrl = async () => {
@@ -103,6 +105,51 @@ export default function DetailsScreen() {
                 imageLink={part.image}
                 token="inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321"
               />
+
+              {/* COUNTER BUTTON HERE */}
+              <TouchableOpacity style={styles.counterButton} onPress={() => setModalVisible(true)}>
+                <Text style={styles.counterButtonText}>Open Counter</Text>
+              </TouchableOpacity>
+
+              {/* Modal for Counter */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.counterText}>Amount to take: {counter}</Text>
+                    <Text style={styles.infoText}>
+                                    Stock: {part.stock}
+                                  </Text>
+                    <View style={styles.buttonRow}>
+                      <TouchableOpacity // Increase counter
+                        style={styles.modalButton}
+                        onPress={() => setCounter((counter >= part.stock ? part.stock : counter+1))}
+                      >
+                        <Text style={styles.buttonText}>+</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity // Decrease couunter
+                        style={styles.modalButton}
+                        onPress={() => setCounter((counter > 0 ? counter - 1 : 0))}
+                      >
+                        <Text style={styles.buttonText}>-</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <TouchableOpacity
+                      style={[styles.modalButton, styles.closeButton]}
+                      onPress={() => setModalVisible(false)}
+                    >
+                      <Text style={styles.buttonText}>Close</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
+
             </>
           ) : (
             <ThemedText style={styles.noResults}>No part found.</ThemedText>
@@ -138,4 +185,53 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 20,
   },
+  counterButton: {
+    backgroundColor: "#007AFF",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  counterButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: 250,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  counterText: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    margin: 5,
+    borderRadius: 8,
+    width: 60,
+    alignItems: "center",
+  },
+  closeButton: {
+    backgroundColor: "red",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
 });
+
+export default DetailsScreen;
