@@ -4,7 +4,7 @@ import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageCard from '@/components/ImageCard';
-
+import StockItemCard from '@/components/StockItemCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
@@ -16,6 +16,7 @@ export default function DetailsScreen() {
   const [apiUrl, setApiUrl] = useState('');
   const [counter, setCounter] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const [stockItems, setStockItems] = useState([]);
 
   useEffect(() => {
     const loadApiUrl = async () => {
@@ -81,6 +82,91 @@ export default function DetailsScreen() {
     fetchPart();
   }, [apiUrl, id]);
 
+  const handleRemoveStock = async (counter, stockItem) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/stock/remove/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: [
+            {
+              pk: stockItem.pk,  // StockItem ID
+              quantity: counter,  // Quantity to remove
+            },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to remove stock: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Stock removed successfully:', data);
+    } catch (error) {
+      console.error('Error removing stock:', error.message);
+    }
+  };
+
+  const handleCheckStockLocations = async () => {
+      try {
+        // Your logic to fetch stock items
+        // function that makes API call to get stock items for the part
+        await fetchStockItemsForPart(part.id);
+
+        // Show the modal with stock item cards
+        setModalVisible(true);
+      } catch (error) {
+        console.error('Error fetching stock locations:', error);
+      }
+  };
+  const fetchStockItemsForPart = async(partId) => {
+      try {
+          setLoading(true);
+          const params = new URLSearchParams();
+          params.append('part', partId);
+          const apiEndpoint = `${apiUrl}/api/stock/?${params.toString()}`;
+
+          const response = await fetch(apiEndpoint, {
+              method: 'GET',
+              headers: {
+                'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+                'Accept': 'application/json',
+                'Connection': 'keep-alive',
+                //'Content-Type': 'application/json',
+                'Host': 'inventree.localhost',
+              },
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(' :', data);
+          // Map the response data into the format required by StockItemCard
+          const fetchedStockItems = data.map(item => ({
+            pk: item.pk,                          // Primary Key
+            part: item.part,                      // Part ID (if needed)
+            quantity: item.quantity,              // Quantity in stock
+            serial: item.serial || 'N/A',         // Serial number (use 'N/A' if not available)
+            batch: item.batch || 'N/A',           // Batch (use 'N/A' if not available)
+            location: item.location || 0,         // Location (use default or '0' if not available)
+            location_name: item.location_name || 'Unknown Location', // Location name (fallback to 'Unknown')
+          }));
+          // Set the fetched stock items to the state
+          setStockItems(fetchedStockItems);
+      } catch (error) {
+          console.error('Error retrieving stock of part:', error.message);
+        } finally {
+          setLoading(false);
+
+        }
+
+  };
   return (
     <ScrollView style={{ flex: 1 }}>
       <ThemedView style={[styles.headerContainer, { backgroundColor: '#A1E8C5' }]}>
@@ -105,50 +191,32 @@ export default function DetailsScreen() {
                 imageLink={part.image}
                 token="inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321"
               />
+              {/* BUTTON FOR CHECKINg STOCK LOCATIONS */}
+               <TouchableOpacity style={styles.button} onPress={handleCheckStockLocations}>
+                 <Text style={styles.buttonText}>Check Stock Locations</Text>
+               </TouchableOpacity>
 
-              {/* COUNTER BUTTON HERE */}
-              <TouchableOpacity style={styles.counterButton} onPress={() => setModalVisible(true)}>
-                <Text style={styles.counterButtonText}>Open Counter</Text>
-              </TouchableOpacity>
+               {/* Modal to show stock item cards */}
+               <Modal
+                 animationType="slide"
+                 transparent={true}
+                 visible={modalVisible}
+                 onRequestClose={() => setModalVisible(false)}
+               >
+                 <View style={styles.modalOverlay}>
+                   <View style={styles.modalContent}>
+                     <ScrollView style={styles.scrollView}>
+                        {stockItems.map((item) => (
+                         <StockItemCard key={item.pk} stockItem={item} handleSubmit={handleRemoveStock} />
+                       ))}
+                     </ScrollView>
 
-              {/* Modal for Counter */}
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.modalContent}>
-                    <Text style={styles.counterText}>Amount to take: {counter}</Text>
-                    <Text style={styles.infoText}>
-                                    Stock: {part.stock}
-                                  </Text>
-                    <View style={styles.buttonRow}>
-                      <TouchableOpacity // Increase counter
-                        style={styles.modalButton}
-                        onPress={() => setCounter((counter >= part.stock ? part.stock : counter+1))}
-                      >
-                        <Text style={styles.buttonText}>+</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity // Decrease couunter
-                        style={styles.modalButton}
-                        onPress={() => setCounter((counter > 0 ? counter - 1 : 0))}
-                      >
-                        <Text style={styles.buttonText}>-</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <TouchableOpacity
-                      style={[styles.modalButton, styles.closeButton]}
-                      onPress={() => setModalVisible(false)}
-                    >
-                      <Text style={styles.buttonText}>Close</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </Modal>
+                     <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+                       <Text style={styles.closeButtonText}>Close</Text>
+                     </TouchableOpacity>
+                   </View>
+                 </View>
+               </Modal>
 
             </>
           ) : (
@@ -185,17 +253,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 20,
   },
-  counterButton: {
-    backgroundColor: "#007AFF",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  counterButtonText: {
-    color: "white",
-    fontSize: 16,
-  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -208,10 +265,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     alignItems: "center",
-  },
-  counterText: {
-    fontSize: 20,
-    marginBottom: 20,
   },
   buttonRow: {
     flexDirection: "row",
@@ -226,11 +279,37 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   closeButton: {
-    backgroundColor: "red",
+    backgroundColor: "#FF3B30",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 15,
+    elevation: 3,
+  },
+  submitButton: {
+      backgroundColor: "green",
+  },
+  button: {
+      backgroundColor: '#1D3557',
+      paddingVertical: 12,
+      paddingHorizontal: 30,
+      borderRadius: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 4,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      marginTop: 20,
   },
   buttonText: {
-    color: "white",
-    fontSize: 16,
+      color: 'white',
+      fontSize: 18,
+      fontWeight: 'bold',
+      textAlign: 'center',
   },
 });
 
