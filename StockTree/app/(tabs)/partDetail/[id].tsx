@@ -39,12 +39,63 @@ export default function DetailsScreen() {
     loadApiUrl();
   }, []);
 
-  useEffect(() => {
-    if (!apiUrl) return;
+  const handleCheckStockLocations = async () => {
+        try {
+          // Your logic to fetch stock items
+          // function that makes API call to get stock items for the part
+          await fetchStockItemsForPart(part.id);
 
-    const fetchPart = async () => {
+        } catch (error) {
+          console.error('Error fetching stock locations:', error);
+        }
+  };
+  const fetchStockItemsForPart = async(partId) => {
+        try {
+            setLoading(true);
+            const params = new URLSearchParams();
+            params.append('part', partId);
+            const apiEndpoint = `${apiUrl}/api/stock/?${params.toString()}`;
+
+            const response = await fetch(apiEndpoint, {
+                method: 'GET',
+                headers: {
+                  'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+                  'Accept': 'application/json',
+                  'Connection': 'keep-alive',
+                  //'Content-Type': 'application/json',
+                  'Host': 'inventree.localhost',
+                },
+            });
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('stock locations :', data);
+            // Map the response data into the format required by StockItemCard
+            const fetchedStockItems = data.map(item => ({
+              pk: item.pk,                          // Primary Key
+              part: item.part,                      // Part ID (if needed)
+              quantity: item.quantity,              // Quantity in stock
+              serial: item.serial || 'N/A',         // Serial number (use 'N/A' if not available)
+              batch: item.batch || 'N/A',           // Batch (use 'N/A' if not available)
+              location: item.location || 0,         // Location (use default or '0' if not available)
+              location_name: item.location_name || 'Unknown Location', // Location name (fallback to 'Unknown')
+            }));
+            // Set the fetched stock items to the state
+            setStockItems(fetchedStockItems);
+        } catch (error) {
+            console.error('Error retrieving stock of part:', error.message);
+          } finally {
+            setLoading(false);
+
+          }
+
+  };
+  const fetchPart = async () => {
       try {
         setLoading(true);
+
         const apiEndpoint = `${apiUrl}/api/part/${id}/`;
 
         const response = await fetch(apiEndpoint, {
@@ -77,11 +128,26 @@ export default function DetailsScreen() {
       } finally {
         setLoading(false);
       }
-    };
+  };
+
+  useEffect(() => {
+    if (!apiUrl) return;
 
     fetchPart();
   }, [apiUrl, id]);
 
+  useEffect(() => {
+    if (part) {
+      handleCheckStockLocations();
+    }
+  }, [part]);
+
+  const refreshData = async () => {
+    await fetchPart();
+    if (part) {
+      await handleCheckStockLocations();
+    }
+  };
   const handleRemoveStock = async (counter, stockItem) => {
     try {
       const response = await fetch(`${apiUrl}/api/stock/remove/`, {
@@ -107,66 +173,13 @@ export default function DetailsScreen() {
 
       const data = await response.json();
       console.log('Stock removed successfully:', data);
+      refreshData();
     } catch (error) {
       console.error('Error removing stock:', error.message);
     }
   };
 
-  const handleCheckStockLocations = async () => {
-      try {
-        // Your logic to fetch stock items
-        // function that makes API call to get stock items for the part
-        await fetchStockItemsForPart(part.id);
 
-        // Show the modal with stock item cards
-        setModalVisible(true);
-      } catch (error) {
-        console.error('Error fetching stock locations:', error);
-      }
-  };
-  const fetchStockItemsForPart = async(partId) => {
-      try {
-          setLoading(true);
-          const params = new URLSearchParams();
-          params.append('part', partId);
-          const apiEndpoint = `${apiUrl}/api/stock/?${params.toString()}`;
-
-          const response = await fetch(apiEndpoint, {
-              method: 'GET',
-              headers: {
-                'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
-                'Accept': 'application/json',
-                'Connection': 'keep-alive',
-                //'Content-Type': 'application/json',
-                'Host': 'inventree.localhost',
-              },
-          });
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          console.log(' :', data);
-          // Map the response data into the format required by StockItemCard
-          const fetchedStockItems = data.map(item => ({
-            pk: item.pk,                          // Primary Key
-            part: item.part,                      // Part ID (if needed)
-            quantity: item.quantity,              // Quantity in stock
-            serial: item.serial || 'N/A',         // Serial number (use 'N/A' if not available)
-            batch: item.batch || 'N/A',           // Batch (use 'N/A' if not available)
-            location: item.location || 0,         // Location (use default or '0' if not available)
-            location_name: item.location_name || 'Unknown Location', // Location name (fallback to 'Unknown')
-          }));
-          // Set the fetched stock items to the state
-          setStockItems(fetchedStockItems);
-      } catch (error) {
-          console.error('Error retrieving stock of part:', error.message);
-        } finally {
-          setLoading(false);
-
-        }
-
-  };
   return (
     <ScrollView style={{ flex: 1 }}>
       <ThemedView style={[styles.headerContainer, { backgroundColor: '#A1E8C5' }]}>
@@ -191,32 +204,16 @@ export default function DetailsScreen() {
                 imageLink={part.image}
                 token="inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321"
               />
-              {/* BUTTON FOR CHECKINg STOCK LOCATIONS */}
-               <TouchableOpacity style={styles.button} onPress={handleCheckStockLocations}>
-                 <Text style={styles.buttonText}>Check Stock Locations</Text>
-               </TouchableOpacity>
 
-               {/* Modal to show stock item cards */}
-               <Modal
-                 animationType="slide"
-                 transparent={true}
-                 visible={modalVisible}
-                 onRequestClose={() => setModalVisible(false)}
-               >
-                 <View style={styles.modalOverlay}>
-                   <View style={styles.modalContent}>
-                     <ScrollView style={styles.scrollView}>
-                        {stockItems.map((item) => (
-                         <StockItemCard key={item.pk} stockItem={item} handleSubmit={handleRemoveStock} />
-                       ))}
-                     </ScrollView>
+              {stockItems && stockItems.length > 0 ? (<View>
+                   {stockItems.map((item) => (
+                    <StockItemCard key={item.pk} stockItem={item} handleSubmit={handleRemoveStock} />
+                  ))}
+              </View>
+              ) : (
 
-                     <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
-                       <Text style={styles.closeButtonText}>Close</Text>
-                     </TouchableOpacity>
-                   </View>
-                 </View>
-               </Modal>
+                <ThemedText style={styles.noResults}>No stock locations found.</ThemedText>
+              )}
 
             </>
           ) : (
@@ -253,30 +250,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 20,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    width: 250,
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignItems: "center",
-  },
   buttonRow: {
     flexDirection: "row",
     marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    margin: 5,
-    borderRadius: 8,
-    width: 60,
-    alignItems: "center",
   },
   closeButton: {
     backgroundColor: "#FF3B30",

@@ -1,37 +1,60 @@
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity, Platform } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PartCard } from '@/components/PartCard';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const API_URL = 'http://inventree.localhost/api/part/';
-const BASE_URL = 'http://inventree.localhost/'
 const SearchPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [apiUrl, setApiUrl] = useState('');
+
+  useEffect(() => {
+    loadApiUrl();
+  }, []);
+// Load the API URL from storage (SecureStore for mobile, AsyncStorage for web)
+  const loadApiUrl = async () => {
+    try {
+      let storedUrl;
+      if (Platform.OS === 'web') {
+        storedUrl = await AsyncStorage.getItem('API_URL');
+      } else {
+        storedUrl = await SecureStore.getItemAsync('API_URL');
+      }
+
+      if (storedUrl) {
+        setApiUrl(`${storedUrl}`);
+        console.log('API URL:', storedUrl);
+      }
+    } catch (error) {
+      console.error('Error loading API URL:', error);
+    }
+  };
 
   // Fetch search results from API
   const handleSearch = async (text: string) => {
       setSearchQuery(text);
       }
+
   const handleSearchButtonPress = async (text: string) => {
 
     console.log('search status:', searchQuery);
-    /*
-    const params = new URLSearchParams({
-              search: searchQuery,
-            });
-        */
+
     const params = new URLSearchParams();
     params.append('search', searchQuery);
 
-    console.log('TEST:', params.toString());
-    setLoading(true);
+    console.log('PARAMS:', params.toString());
+
     try {
-      const response = await fetch(`${API_URL}?${params.toString()}`, {
+      setLoading(true);
+      //loadApiUrl();
+      if (!apiUrl) return;
+      const response = await fetch(`${apiUrl}/api/part/?${params.toString()}`, {
             method: 'GET',
             headers: {
               'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
@@ -55,12 +78,11 @@ const SearchPage: React.FC = () => {
                 throw new Error('Empty response received.');
       }
       console.log('Raw response data:', data);
-      const BASE_URL = "http://inventree.localhost";
       const parts = data.map(item => ({
                 id: item.pk,                          // Mapping pk to id
                 name: item.name || 'Unknown',  // Using name for location name
                 stock: item.in_stock,                 // Using stock for showing available stock
-                image: item.image ? `${BASE_URL}${item.image}` : null, // ImageURL
+                image: item.image ? `${apiUrl}${item.image}` : null, // ImageURL
 
 
       }));

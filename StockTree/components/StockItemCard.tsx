@@ -8,7 +8,7 @@ const StockItemCard = ({ stockItem, handleSubmit }) => {
   return (
     <View style={styles.cardContainer}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>Part stock details</Text>
+        <Text style={styles.title}>{stockItem.location_name}</Text>
       </View>
     {/*
       <View style={styles.detailContainer}>
@@ -36,11 +36,12 @@ const StockItemCard = ({ stockItem, handleSubmit }) => {
         <Text style={styles.value}>{stockItem.location}</Text>
       </View>
 */}
+{/*
       <View style={styles.detailContainer}>
         <Text style={styles.label}>Location Name:</Text>
         <Text style={styles.value}>{stockItem.location_name}</Text>
       </View>
-
+*/}
       {/* COUNTER BUTTON */}
       <TouchableOpacity style={styles.counterButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.counterButtonText}>Adjust Quantity</Text>
