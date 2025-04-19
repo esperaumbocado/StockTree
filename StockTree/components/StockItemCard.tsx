@@ -4,6 +4,29 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 const StockItemCard = ({ stockItem, handleSubmit }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [counter, setCounter] = useState(0);
+  const [isWledOn, setIsWledOn] = useState(false);
+  const WLED_IP = "http://192.168.1.100"; // Replace with actual WLED IP
+
+  const toggleWLED = async () => {
+    console.log('CONNECTING TO WLED... NOT IMPLEMENTED');
+  /*
+    try {
+      const response = await fetch(`${WLED_IP}/json/state`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ on: !isWledOn }),
+      });
+
+      if (response.ok) {
+        setIsWledOn(!isWledOn);
+      } else {
+        console.error("Failed to toggle WLED");
+      }
+    } catch (error) {
+      console.error("Error connecting to WLED:", error);
+    }
+   */
+  };
 
   return (
     <View style={styles.cardContainer}>
@@ -42,6 +65,10 @@ const StockItemCard = ({ stockItem, handleSubmit }) => {
         <Text style={styles.value}>{stockItem.location_name}</Text>
       </View>
 */}
+      {/*LOCATE WITH WLED BUTTON */}
+      <TouchableOpacity style={styles.counterButton} onPress={() => toggleWLED()}>
+        <Text style={styles.counterButtonText}>Locate</Text>
+      </TouchableOpacity>
       {/* COUNTER BUTTON */}
       <TouchableOpacity style={styles.counterButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.counterButtonText}>Adjust Quantity</Text>

@@ -49,7 +49,21 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="search"
+        options={{
+          title: 'Search',
+          tabBarIcon: ({ color }) => <FontAwesome name="search" size={28} color={color} />,
+        }}
+      />
 
+      <Tabs.Screen
+        name="myPartsList"
+        options={{
+          title: 'My Parts',
+          tabBarIcon: ({ color }) => <FontAwesome name="list" size={28} color={color} />,
+        }}
+      />
       <Tabs.Screen
               name="categoryDetail"
               options={{

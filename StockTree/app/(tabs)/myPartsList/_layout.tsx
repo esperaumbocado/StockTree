@@ -25,9 +25,9 @@ export default function PartDetailLayout() {
       }}
     >
       <Stack.Screen
-        name="[id]"
+        name="myParts"
         options={{
-          title: "Part Details",
+          title: "My Parts",
           headerLeft: () => (
             <View style={styles.headerLeftContainer}>
               <TouchableOpacity onPressIn={handleBackPress} style={styles.backButton}>
