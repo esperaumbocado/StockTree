@@ -7,8 +7,7 @@ import ImageCard from '@/components/ImageCard';
 import StockItemCard from '@/components/StockItemCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
-import { fetchStockItemsForPart } from '@/utils/utils';
+import { fetchStockItemsForPart,  } from '@/utils/utils';
 
 export default function DetailsScreen() {
   const { id, partName } = useLocalSearchParams(); // Get part ID and name from params
@@ -169,7 +168,7 @@ export default function DetailsScreen() {
 
               {stockItems && stockItems.length > 0 ? (<View>
                    {stockItems.map((item) => (
-                    <StockItemCard key={item.pk} stockItem={item} handleSubmit={handleRemoveStock} />
+                    <StockItemCard key={item.pk} stockItem={item} apiUrl={apiUrl} refreshData={refreshData} />
                   ))}
               </View>
               ) : (

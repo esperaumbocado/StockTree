@@ -4,7 +4,7 @@ import { Card } from "react-native-paper";
 import ImageCard from './ImageCard';
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchStockItemsForPart } from '@/utils/utils';
+import { fetchStockItemsForPart, addPart } from '@/utils/utils';
 
 const PartCard = ({name, stock, image, partId, apiUrl}) => {
   const colorScheme = useColorScheme();
@@ -25,7 +25,7 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
         }
         // only one location found
         else if (stockItems.length === 1){
-            await addPart(stockItems[0].pk);
+            await addPart(partId, stockItems[0].pk, SELECTED_PARTS_KEY);
             return;
         }
         else{
@@ -39,39 +39,7 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
     }
 
   };
-  // Store part info
-  const addPart = async (stockLocationId) => {
-    console.log('stockLocationId: ', stockLocationId);
-    try {
-      //await AsyncStorage.setItem(SELECTED_PARTS_KEY, JSON.stringify([]));
-      const stored = await AsyncStorage.getItem(SELECTED_PARTS_KEY);
-      const now = Date.now();
 
-      let current = stored ? JSON.parse(stored) : [];
-
-      // Remove expired
-      //current = current.filter(item => now - item.timestamp < 86400000);
-
-      const alreadyAdded = current.some(item =>  item.partId === partId && item.stockLocationId === stockLocationId);
-      if (alreadyAdded) {
-        Alert.alert("Already added", "This part is already selected.");
-        return;
-      }
-
-      current.push({
-        partId,
-        timestamp: now,
-        stockLocationId,
-
-      });
-      console.log("Selected Parts (about to be saved):", current);
-      await AsyncStorage.setItem(SELECTED_PARTS_KEY, JSON.stringify(current));
-      Alert.alert("Success", "Part added to selected parts");
-    } catch (err) {
-      console.error("Add failed:", err);
-      Alert.alert("Error", "Could not add part.");
-    }
-  };
 
   // GO TO DETAILS PAGE
   const navigateToDetails = () => {
@@ -122,7 +90,7 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
               <TouchableOpacity
                 style={styles.modalItem}
                 onPress={async () => {
-                  await addPart(item.pk);
+                  await addPart(partId, item.pk, SELECTED_PARTS_KEY);
                   setShowLocationModal(false);
                 }}
               >

@@ -200,6 +200,9 @@ export default function MyPartsScreen() {
       setLoading(false); // Set loading to false once fetching is complete
     }
   };
+  const refreshData= async () => {
+    await fetchMyParts();
+  };
 
   useEffect(() => {
     loadApiUrl();
@@ -246,6 +249,7 @@ export default function MyPartsScreen() {
                         key={key}
                         name={part.name}
                         stock={part.available_stock}
+                        stockLocationId={part.stockLocationId}
                         stockName={part.stockName}
                         image={part.image ? `${apiUrl}${part.image}` : null}
                         selectionMode={selectionMode}
@@ -262,6 +266,8 @@ export default function MyPartsScreen() {
                           setSelectedParts(updated);
                           console.log('New Selected Parts', updated);
                         }}
+                        apiUrl={apiUrl}
+                        refreshData={refreshData}
                       />
                     )}
                   </View>

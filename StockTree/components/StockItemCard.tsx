@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { addPart, handleRemoveStock } from '@/utils/utils';
 
-const StockItemCard = ({ stockItem, handleSubmit }) => {
+const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [counter, setCounter] = useState(0);
   const [isWledOn, setIsWledOn] = useState(false);
   const WLED_IP = "http://192.168.1.100"; // Replace with actual WLED IP
-
+  const SELECTED_PARTS_KEY = "selected_parts";
   const toggleWLED = async () => {
     console.log('CONNECTING TO WLED... NOT IMPLEMENTED');
   /*
@@ -65,13 +66,25 @@ const StockItemCard = ({ stockItem, handleSubmit }) => {
         <Text style={styles.value}>{stockItem.location_name}</Text>
       </View>
 */}
+      {/*ADD STOCKITEM TO MYLIST*/}
+      <TouchableOpacity
+        activeOpacity={0.5} // gives visual feedback on press
+        style={styles.button}
+        onPress={async () => {
+          console.log('stockItem part', stockItem.part);
+          await addPart(stockItem.part, stockItem.pk, SELECTED_PARTS_KEY);
+        }}
+      >
+        <Text style={styles.buttonText}>Add</Text>
+      </TouchableOpacity>
+
       {/*LOCATE WITH WLED BUTTON */}
-      <TouchableOpacity style={styles.counterButton} onPress={() => toggleWLED()}>
-        <Text style={styles.counterButtonText}>Locate</Text>
+      <TouchableOpacity style={styles.button} onPress={() => toggleWLED()}>
+        <Text style={styles.buttonText}>Locate</Text>
       </TouchableOpacity>
       {/* COUNTER BUTTON */}
-      <TouchableOpacity style={styles.counterButton} onPress={() => setModalVisible(true)}>
-        <Text style={styles.counterButtonText}>Adjust Quantity</Text>
+      <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
+        <Text style={styles.buttonText}>Adjust Quantity</Text>
       </TouchableOpacity>
 
       {/* Modal for Counter */}
@@ -104,7 +117,7 @@ const StockItemCard = ({ stockItem, handleSubmit }) => {
             <TouchableOpacity
               style={[styles.modalButton, styles.submitButton]}
               onPress={() => {
-                handleSubmit(counter, stockItem); // Assuming handleSubmit expects the counter value
+                handleRemoveStock(apiUrl, counter, stockItem.pk, refreshData); // Assuming handleSubmit expects the counter value
                 setModalVisible(false); // Close the modal after submitting
               }}
             >
@@ -159,7 +172,7 @@ const styles = StyleSheet.create({
     color: '#1D3557', // Consistent muted blue for values
     fontWeight: 'bold',
   },
-  counterButton: {
+  button: {
     backgroundColor: '#457B9D', // A cooler and lighter blue shade
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -167,7 +180,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: 'center',
   },
-  counterButtonText: {
+  buttonText: {
     color: '#ffffff', // White text on the counter button
     fontSize: 16,
     textAlign: 'center',
