@@ -50,7 +50,7 @@ export default function DetailsScreen() {
         const response = await fetch(apiEndpoint, {
           method: 'GET',
           headers: {
-            Authorization: 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+            Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
             Accept: 'application/json',
             Connection: 'keep-alive',
             Host: 'inventree.localhost',
@@ -87,7 +87,7 @@ export default function DetailsScreen() {
       const response = await fetch(`${apiUrl}/api/stock/remove/`, {
         method: 'POST',
         headers: {
-          'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+          'Authorization': 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
@@ -134,7 +134,7 @@ export default function DetailsScreen() {
           const response = await fetch(apiEndpoint, {
               method: 'GET',
               headers: {
-                'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+                'Authorization': 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
                 'Accept': 'application/json',
                 'Connection': 'keep-alive',
                 //'Content-Type': 'application/json',
@@ -189,7 +189,7 @@ export default function DetailsScreen() {
               </Text>
               <ImageCard
                 imageLink={part.image}
-                token="inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321"
+                token="inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228"
               />
               {/* BUTTON FOR CHECKINg STOCK LOCATIONS */}
                <TouchableOpacity style={styles.button} onPress={handleCheckStockLocations}>
