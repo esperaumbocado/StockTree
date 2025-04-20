@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity, Platform } from 'react-native';
+import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity, Platform, useColorScheme } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
@@ -9,6 +9,7 @@ import { PartCard } from '@/components/PartCard';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const SearchPage: React.FC = () => {
+    const colorScheme = useColorScheme();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -116,7 +117,7 @@ const SearchPage: React.FC = () => {
                     onChangeText={handleSearch}
                   />
             <TouchableOpacity style={styles.searchButton} onPress={handleSearchButtonPress}>
-                    <Icon name="search" size={20} color="#fff" />
+                    <Icon name="search" size={20}  color={colorScheme === 'dark' ? '#fff' : '#1D3D47'}  />
             </TouchableOpacity>
           {loading ? (
             <ActivityIndicator size="large" color="#000" style={styles.loader} />
