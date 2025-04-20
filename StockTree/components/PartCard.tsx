@@ -1,17 +1,49 @@
-import React from "react";
-import { View, Text, StyleSheet, useColorScheme, Pressable, Alert} from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, useColorScheme, Pressable, Alert, Modal, FlatList, TouchableOpacity, } from "react-native";
 import { Card } from "react-native-paper";
 import ImageCard from './ImageCard';
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchStockItemsForPart } from '@/utils/utils';
 
-const PartCard = ({name, stock, image, partId}) => {
+const PartCard = ({name, stock, image, partId, apiUrl}) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationOptions, setLocationOptions] = useState([]);
+
   const SELECTED_PARTS_KEY = "selected_parts";
+
   // HANDLE ADDING PART
   const handleAddPart = async () => {
     try {
+        const stockItems = await fetchStockItemsForPart(partId, apiUrl);
+        // Error, no stock locations found for part
+        if (stockItems.length < 1){
+          Alert.alert("Not found", "No locations associated with this part were found.");
+          return;
+        }
+        // only one location found
+        else if (stockItems.length === 1){
+            await addPart(stockItems[0].pk);
+            return;
+        }
+        else{
+        // Show modal with location options
+            setLocationOptions(stockItems);
+            setShowLocationModal(true);
+        }
+    } catch (err) {
+        console.error("Error in handleAddPart:", err);
+        Alert.alert("Error", "Something went wrong while adding the part.");
+    }
+
+  };
+  // Store part info
+  const addPart = async (stockLocationId) => {
+    console.log('stockLocationId: ', stockLocationId);
+    try {
+      //await AsyncStorage.setItem(SELECTED_PARTS_KEY, JSON.stringify([]));
       const stored = await AsyncStorage.getItem(SELECTED_PARTS_KEY);
       const now = Date.now();
 
@@ -20,7 +52,7 @@ const PartCard = ({name, stock, image, partId}) => {
       // Remove expired
       //current = current.filter(item => now - item.timestamp < 86400000);
 
-      const alreadyAdded = current.some(item => item.partId === partId);
+      const alreadyAdded = current.some(item =>  item.partId === partId && item.stockLocationId === stockLocationId);
       if (alreadyAdded) {
         Alert.alert("Already added", "This part is already selected.");
         return;
@@ -29,6 +61,8 @@ const PartCard = ({name, stock, image, partId}) => {
       current.push({
         partId,
         timestamp: now,
+        stockLocationId,
+
       });
       console.log("Selected Parts (about to be saved):", current);
       await AsyncStorage.setItem(SELECTED_PARTS_KEY, JSON.stringify(current));
@@ -48,6 +82,7 @@ const PartCard = ({name, stock, image, partId}) => {
   };
 
   return (
+    <>
     <View style={styles.cardContainer}>
       <Pressable onPress={navigateToDetails} style={({ pressed }) => [
         styles.card,
@@ -61,11 +96,51 @@ const PartCard = ({name, stock, image, partId}) => {
         <ImageCard imageLink={image} />
 
         {/* Add button lives *inside* card but isn't wrapped by outer pressable */}
-        <Pressable onPress={handleAddPart} style={styles.addButton}>
+        <TouchableOpacity
+          onPress={handleAddPart}
+          activeOpacity={0.5} // gives visual feedback on press
+          style={styles.addButton}
+        >
           <Text style={styles.addButtonText}>Add</Text>
-        </Pressable>
+        </TouchableOpacity>
       </Pressable>
     </View>
+    {/* Modal for choosing stock location */}
+    <Modal
+      visible={showLocationModal}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowLocationModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Select a Location</Text>
+          <FlatList
+            data={locationOptions}
+            keyExtractor={(item) => item.pk.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.modalItem}
+                onPress={async () => {
+                  await addPart(item.pk);
+                  setShowLocationModal(false);
+                }}
+              >
+                <Text style={styles.modalItemText}>{item.location_name}</Text>
+              </TouchableOpacity>
+            )}
+          />
+          <TouchableOpacity
+            style={styles.modalCancelButton}
+            onPress={() => setShowLocationModal(false)}
+          >
+            <Text style={styles.modalCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+
+    </>
   );
 };
 
@@ -110,12 +185,52 @@ const styles = StyleSheet.create({
       height: 100,
       marginTop: 10,
       borderRadius: 8,
-    },
-    noImage: {
+  },
+  noImage: {
       fontSize: 14,
       color: "#black",
       marginTop: 5,
-    },
+  },
+
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    maxHeight: '70%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  modalItemText: {
+    fontSize: 16,
+  },
+  modalCancelButton: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: 'red',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
+
 });
 
 export { PartCard };

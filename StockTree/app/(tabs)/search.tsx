@@ -129,6 +129,7 @@ const SearchPage: React.FC = () => {
                   stock={stock}
                   image={image}
                   partId={id}
+                  apiUrl={apiUrl}
 
                 />
               ))}
