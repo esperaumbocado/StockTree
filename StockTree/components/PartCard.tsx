@@ -1,16 +1,23 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, useColorScheme, Pressable, Alert, Modal, FlatList, TouchableOpacity, } from "react-native";
+import { View, Text, StyleSheet, useColorScheme, Pressable, Alert, Modal, FlatList, TouchableOpacity } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import { Card } from "react-native-paper";
 import ImageCard from './ImageCard';
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchStockItemsForPart, addPart } from '@/utils/utils';
+import { fetchStockItemsForPart, addPart, getMyLists, addPartToList } from '@/utils/utils';
 
 const PartCard = ({name, stock, image, partId, apiUrl}) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showAddConfigModal, setShowAddConfigModal] = useState(false);
   const [locationOptions, setLocationOptions] = useState([]);
+  //const [listOptions, setListOptions] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedListId, setSelectedListId] = useState("");
+  const [lists, setLists] = useState([]);
+
 
   const SELECTED_PARTS_KEY = "selected_parts";
 
@@ -39,6 +46,38 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
     }
 
   };
+
+  const handleAddPartToList = async () => {
+      try {
+          const stockItems = await fetchStockItemsForPart(partId, apiUrl);
+          const myLists = await getMyLists();
+          // Error, no stock locations found for part
+          if (stockItems.length < 1){
+            Alert.alert("Not found", "No locations associated with this part were found.");
+            return;
+          }
+          else if (myLists.length < 1){
+            Alert.alert("You have no lists at the moment.");
+            return;
+          }
+
+
+
+          else{
+          // Show modal with configuration options
+              console.log("MyLists: ");
+              console.log(myLists);
+              setLocationOptions(stockItems);
+              setLists(myLists);
+              setShowAddConfigModal(true);
+
+          }
+      } catch (err) {
+          console.error("Error in handleAddPartToList:", err);
+          Alert.alert("Error", "Something went wrong while fetching configurations to add the part to a list.");
+      }
+
+    };
 
 
   // GO TO DETAILS PAGE
@@ -70,6 +109,15 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
           style={styles.addButton}
         >
           <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+
+        {/* Add part to a list button  */}
+        <TouchableOpacity
+          onPress={handleAddPartToList}
+          activeOpacity={0.5} // gives visual feedback on press
+          style={styles.addButton}
+        >
+          <Text style={styles.addButtonText}>Add to a list</Text>
         </TouchableOpacity>
       </Pressable>
     </View>
@@ -107,6 +155,74 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
         </View>
       </View>
     </Modal>
+
+    {/* Modal for choosing stock location and list */}
+    <Modal
+      visible={showAddConfigModal}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowAddConfigModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Select a Location</Text>
+
+          {/* Location Picker */}
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedLocation?.pk?.toString() || ""}
+              onValueChange={(itemValue) => {
+                const location = locationOptions.find(loc => loc.pk.toString() === itemValue);
+                setSelectedLocation(location || null);
+              }}
+            >
+              <Picker.Item label="Choose a location..." value="" enabled={false} />
+              {locationOptions.map((loc) => (
+                <Picker.Item key={loc.pk} label={loc.location_name} value={loc.pk.toString()} />
+              ))}
+            </Picker>
+          </View>
+
+          {/* List Picker */}
+          <Text style={styles.modalTitle}>Select a List</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedListId?.toString() || ""}
+              onValueChange={(itemValue) => setSelectedListId(itemValue)}
+            >
+              <Picker.Item label="Choose a list..." value="" enabled={false} />
+              {lists.map((list) => (
+                <Picker.Item label={list.name} value={list.id.toString()} key={list.id} />
+              ))}
+            </Picker>
+          </View>
+
+          {/* Confirm / Cancel Buttons */}
+          <View style={styles.modalButtons}>
+            <TouchableOpacity onPress={() => setShowAddConfigModal(false)} style={styles.modalCancelButton}>
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={async () => {
+                const selectedList = lists.find((l) => l.id.toString() === selectedListId);
+                if (selectedLocation && selectedList) {
+                  await addPartToList(partId, selectedLocation.pk, selectedList.id);
+                  setSelectedLocation(null);
+                  setSelectedListId(null);
+                  setShowAddConfigModal(false);
+                } else {
+                  Alert.alert("Selection Incomplete", "Please select both a location and a list.");
+                }
+              }}
+              style={styles.modalConfirmButton}
+            >
+              <Text style={styles.modalConfirmText}>Add Part</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+
 
     </>
   );
@@ -197,6 +313,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  modalConfirmButton: {
+    backgroundColor: '#1D3557',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+  },
+  modalConfirmText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+
 
 
 });

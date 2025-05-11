@@ -15,7 +15,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
+    screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
@@ -27,59 +27,67 @@ export default function TabLayout() {
           },
           default: {},
         }),
-      }}>
-      <Tabs.Screen
+    }}>
+    <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
-      />
-      <Tabs.Screen
+    />
+    <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
-      />
-      <Tabs.Screen
+    />
+    <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
         }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: 'Search',
-          tabBarIcon: ({ color }) => <FontAwesome name="search" size={28} color={color} />,
-        }}
-      />
-
-      <Tabs.Screen
-        name="myPartsList"
-        options={{
-          title: 'My Parts',
-          tabBarIcon: ({ color }) => <FontAwesome name="list" size={28} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-              name="categoryDetail"
-              options={{
-                title: 'Category Detail',
-                href: null,
-                tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
-              }}
-            />
+    />
     <Tabs.Screen
-                  name="partDetail"
-                  options={{
-                    title: 'Part Detail',
-                    href: null,
-                    tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
-                  }}
-                />
+      name="search"
+      options={{
+        title: 'Search',
+        tabBarIcon: ({ color }) => <FontAwesome name="search" size={28} color={color} />,
+      }}
+    />
+
+    <Tabs.Screen
+      name="myPartsList"
+      options={{
+        title: 'My Parts',
+        tabBarIcon: ({ color }) => <FontAwesome name="list" size={28} color={color} />,
+      }}
+    />
+    <Tabs.Screen
+      name="categoryDetail"
+      options={{
+        title: 'Category Detail',
+        href: null,
+        tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
+      }}
+    />
+    <Tabs.Screen
+      name="partDetail"
+      options={{
+        title: 'Part Detail',
+        href: null,
+        tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
+      }}
+    />
+    <Tabs.Screen
+      name="myListDetails"
+      options={{
+        href: null, // hides it from the tab bar
+      }}
+    />
+
+
         </Tabs>
 
   );

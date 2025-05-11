@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Text,
-  Modal,
-  TextInput,
-  Alert,
-  useColorScheme,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, Text, Modal, TextInput, Alert, useColorScheme} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import MyListCard from '@/components/MyListCard';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 export default function MyListsScreen() {
   const [lists, setLists] = useState([]);
@@ -24,9 +16,12 @@ export default function MyListsScreen() {
 
   const STORAGE_KEY = 'MY_LISTS';
 
-  useEffect(() => {
-    loadLists();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadLists();
+    }, [])
+  );
+
 
   const loadLists = async () => {
     const json = await AsyncStorage.getItem(STORAGE_KEY);
@@ -62,6 +57,15 @@ export default function MyListsScreen() {
     setNewListName('');
     setModalVisible(false);
   };
+  const handlePress = (listId) => {
+    console.log("listId");
+    console.log(listId);
+    router.push({
+      pathname: `/myListDetails/${listId}`,  // Ensure it's a string
+    });
+
+
+  };
 
   return (
     <View style={styles.container}>
@@ -71,7 +75,7 @@ export default function MyListsScreen() {
             key={list.id}
             title={list.name}
             itemCount={list.items.length}
-            onPress={() => router.push(`/myLists/${list.id}`)}
+            onPress={() => handlePress(list.id)} // ✅ Correct!
           />
         ))}
       </ScrollView>
@@ -177,3 +181,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default MyListsScreen;

@@ -43,6 +43,77 @@ import {Alert } from "react-native";
 
   };
 
+  export const getMyLists = async() => {
+          const MY_LISTS_KEY = 'MY_LISTS';
+          let current = [];
+          try {
+                //await AsyncStorage.setItem(SELECTED_PARTS_KEY, JSON.stringify([]));
+                const stored = await AsyncStorage.getItem(MY_LISTS_KEY);
+
+
+                current = stored ? JSON.parse(stored) : [];
+
+
+          } catch (err) {
+                console.error("Add failed:", err);
+                Alert.alert("Error", "Could not find any lists.");
+
+          } finally{
+            return current;
+          }
+
+
+  };
+
+  // Store part info
+
+  export const addPartToList = async (partId, stockLocationId, listId) => {
+    const MY_LISTS_KEY = 'MY_LISTS';
+    try {
+
+
+      // Get stored lists
+      const stored = await AsyncStorage.getItem(MY_LISTS_KEY);
+      const lists = stored ? JSON.parse(stored) : [];
+
+      // Find the specific list by ID
+      const targetListIndex = lists.findIndex(list => list.id === listId);
+      if (targetListIndex === -1) {
+        Alert.alert("List Not Found", "The selected list does not exist.");
+        return;
+      }
+
+      const targetList = lists[targetListIndex];
+
+      // Check if the part already exists in this list
+      const alreadyAdded = targetList.items.some(
+        item => item.partId === partId && item.stockLocationId === stockLocationId
+      );
+
+      if (alreadyAdded) {
+        Alert.alert("Already Added", "This part already exists in the selected list.");
+        return;
+      }
+
+      // Add the new part to the list
+      targetList.items.push({
+        partId,
+        stockLocationId,
+
+      });
+
+      // Update and save all lists
+      lists[targetListIndex] = targetList;
+      await AsyncStorage.setItem(MY_LISTS_KEY, JSON.stringify(lists));
+
+      Alert.alert("Success", "Part added to the list.");
+    } catch (err) {
+      console.error("Add to list failed:", err);
+      Alert.alert("Error", "Could not add part to the list.");
+    }
+  };
+
+
   // Store part info
   export const addPart = async (partId, stockLocationId, SELECTED_PARTS_KEY) => {
     console.log('stockLocationId: ', stockLocationId);
