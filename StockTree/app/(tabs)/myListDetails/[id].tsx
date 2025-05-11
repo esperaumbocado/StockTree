@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 
 import { useFocusEffect } from '@react-navigation/native';
 import { MyPartCard } from '@/components/MyPartCard';
-import {ThemedText} from '@/components/ThemedText'; // Adjust path
+import {ThemedText} from '@/components/ThemedText';
 
 
 
@@ -77,11 +77,21 @@ export default function MyListParts(){
                 throw new Error(`Failed to fetch part with ID ${id}`);
               }
               return response.json();
+            }).catch(error => {
+                console.error(`Error fetching part with ID ${id}:`, error);
+                return null; // Return null for failed fetches
             })
           );
 
-          const parts = await Promise.all(partPromises);
-          return parts;
+            // Wait for all promises to settle (success or failure)
+            const results = await Promise.allSettled(partPromises);
+
+            // Filter out the null results (failed requests)
+            const successfulParts = results
+              .filter(result => result.status === 'fulfilled' && result.value !== null)
+              .map(result => result.value); // Extract the successful responses
+
+            return successfulParts; // Return only the successfully fetched parts
         } catch (error) {
           console.error('Error fetching multiple parts:', error);
           return [];
@@ -90,8 +100,9 @@ export default function MyListParts(){
 
     // Get stockItem from stockId
     const fetchStockItems = async (ids: number[], apiUrl: string, token: string) => {
-        try {
-          const fetchPromises = ids.map(async (id) => {
+      try {
+        const fetchPromises = ids.map(async (id) => {
+          try {
             const response = await fetch(`${apiUrl}/api/stock/${id}/`, {
               method: 'GET',
               headers: {
@@ -111,14 +122,25 @@ export default function MyListParts(){
               name: data.location_name,
               available_stock: data.quantity,
             };
-          });
+          } catch (error) {
+            console.error(`Error fetching stockItem with PK ${id}:`, error);
+            return null; // Return null if fetching a stock item fails
+          }
+        });
 
-          const stockItems = await Promise.all(fetchPromises);
-          return stockItems;
-        } catch (error) {
-          console.error('Error fetching multiple stock items:', error);
-          return [];
-        }
+        // Use Promise.allSettled to wait for all promises to settle (whether fulfilled or rejected)
+        const results = await Promise.allSettled(fetchPromises);
+
+        // Filter out any null results (failed requests) and return only the successful ones
+        const successfulStockItems = results
+          .filter(result => result.status === 'fulfilled' && result.value !== null)
+          .map(result => result.value); // Extract successful stock items
+
+        return successfulStockItems;
+      } catch (error) {
+        console.error('Error fetching multiple stock items:', error);
+        return []; // Return an empty array in case of any other errors
+      }
     };
 
 
@@ -160,10 +182,10 @@ export default function MyListParts(){
               const stockItem = stockMap.get(stockLocationId);
 
               return {
-                ...(part || {}),
+                ...(part || { pk: partId}),
                 stockLocationId,
-                stockName: stockItem?.name ?? 'Unknown Location',
-                available_stock: stockItem?.available_stock ?? 0,
+                stockName: stockItem? stockItem.name : 'Unknown Location',
+                available_stock: stockItem? stockItem.available_stock : 0,
                 isPartMissing: !part,
                 isStockMissing: !stockItem,
               };
@@ -298,6 +320,7 @@ export default function MyListParts(){
                       console.log(key);
                       console.log('Rendering MyPartCard with:', {
                         key,
+                        pk: part.pk,
                         name: part.name,
                         stock: part.available_stock,
                         stockLocationId: part.stockLocationId,
@@ -312,9 +335,29 @@ export default function MyListParts(){
                         <View key={key}>
 
                             {part.isPartMissing || part.isStockMissing ? (
-                            <Text style={{ color: 'red' }}>
-                              Incomplete data for this part.
-                            </Text>
+                                <MyPartCard
+                                  key={key}
+                                  name={part.name}
+                                  stock={part.available_stock}
+                                  stockLocationId={part.stockLocationId}
+                                  stockName={part.stockName}
+                                  image={part.image ? `${apiUrl}${part.image}` : null}
+                                  selectionMode={selectionMode}
+                                  isSelected={selectedParts.has(part.stockLocationId)}
+                                  onLongPress={() => setSelectionMode(true)}
+                                  onSelectToggle={() => {
+                                    const updated = new Set(selectedParts);
+                                    if (updated.has(part.stockLocationId)) {
+                                      updated.delete(part.stockLocationId);
+                                    } else {
+                                      updated.add(part.stockLocationId);
+                                    }
+                                    setSelectedParts(updated);
+                                  }}
+                                  apiUrl={apiUrl}
+                                  refreshData={ refreshData}
+                                  isUnavailable = {true}
+                                />
                           ) : (
 
                             <MyPartCard
@@ -338,6 +381,7 @@ export default function MyListParts(){
                               }}
                               apiUrl={apiUrl}
                               refreshData={ refreshData}
+
                             />
                           )}
                         </View>

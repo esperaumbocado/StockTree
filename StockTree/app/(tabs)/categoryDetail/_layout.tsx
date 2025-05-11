@@ -8,7 +8,7 @@ export default function CategoryDetailLayout() {
 
   const handleBackPress = () => {
     console.log("Back button pressed");
-    router.back();
+    router.replace('/');
   };
 
   return (

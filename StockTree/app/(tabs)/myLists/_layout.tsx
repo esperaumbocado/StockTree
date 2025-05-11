@@ -7,9 +7,7 @@ export default function MyListsLayout() {
   const colorScheme = useColorScheme();
   const backIcon = Platform.OS === 'ios' ? 'chevron-back' : 'arrow-back-sharp';
 
-  const handleBackPress = () => {
-    router.back();
-  };
+
 
   return (
     <Stack
@@ -26,19 +24,19 @@ export default function MyListsLayout() {
       }}
     >
       <Stack.Screen
-        name="myLists"
+        name="index"
         options={{
           title: 'My Lists',
           headerLeft: () => (
             <View style={styles.headerLeftContainer}>
-              <TouchableOpacity onPressIn={handleBackPress} style={styles.backButton}>
-                <Ionicons
-                  name={backIcon}
-                  size={25}
-                  color={colorScheme === 'dark' ? 'white' : 'black'}
-                />
-              </TouchableOpacity>
+              <Ionicons
+                name="list"
+                size={25}
+                style={styles.listButton}
+                color={colorScheme === 'dark' ? 'white' : 'black'}
+              />
             </View>
+
           ),
         }}
       />
@@ -53,7 +51,8 @@ const styles = StyleSheet.create({
     marginLeft: -10,
     marginRight: 10,
   },
-  backButton: {
+  listButton: {
+    marginLeft: 10,
     padding: 10,
   },
 });

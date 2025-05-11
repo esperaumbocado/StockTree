@@ -58,9 +58,9 @@ export default function TabLayout() {
     />
 
     <Tabs.Screen
-      name="myPartsList"
+      name="myLists"
       options={{
-        title: 'My Parts',
+        title: 'My Lists',
         tabBarIcon: ({ color }) => <FontAwesome name="list" size={28} color={color} />,
       }}
     />
@@ -86,7 +86,12 @@ export default function TabLayout() {
         href: null, // hides it from the tab bar
       }}
     />
-
+    <Tabs.Screen
+      name="myPartsList"
+      options={{
+        href: null, // hides it from the tab bar
+      }}
+    />
 
         </Tabs>
 

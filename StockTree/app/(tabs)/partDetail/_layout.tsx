@@ -11,7 +11,7 @@ export default function PartDetailLayout() {
 
   const handleBackPress = () => {
     console.log("Back button pressed");
-    router.back();
+    router.replace('/search');
   };
 
   return (

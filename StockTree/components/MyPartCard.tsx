@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, useColorScheme, Pressable, TouchableOpacity, Modal } from "react-native";
 import { Card } from "react-native-paper";
+import {ThemedText} from '@/components/ThemedText';
 import ImageCard from "./ImageCard";
 import { handleRemoveStock } from '@/utils/utils';
 const MyPartCard = ({
@@ -15,6 +16,7 @@ const MyPartCard = ({
   onSelectToggle,
   apiUrl,
   refreshData,
+  isUnavailable = false,
 }) => {
   const colorScheme = useColorScheme();
 
@@ -31,11 +33,28 @@ const MyPartCard = ({
   };
 
   return (
+
     <Pressable
       onLongPress={onLongPress}
       onPress={selectionMode ? onSelectToggle : undefined}
       style={[styles.cardContainer, { backgroundColor: selectedHighlight }]}
     >
+      {isUnavailable ? (
+
+      <View style={[styles.card, styles.unavailableCard]}>
+        <Text style={[styles.unavailableText, { color: textColor }]}>Part not available</Text>
+        <Text style={[styles.details, { color: textColor, fontStyle: 'italic' }]}>
+          This part could not be found or may have been removed.
+        </Text>
+        {selectionMode && (
+          <Text style={[styles.selectHint, { color: isSelected ? "#00796b" : "#888" }]}>
+            {isSelected ? "✓ Selected" : "Tap to select"}
+          </Text>
+        )}
+      </View>
+
+      ) : (
+
       <View style={[styles.card]}>
         <ImageCard imageLink={image} />
         <Text style={[styles.title, { color: textColor }]}>{name}</Text>
@@ -102,6 +121,10 @@ const MyPartCard = ({
           </View>
         </Modal>
       </View>
+
+
+      )}
+
     </Pressable>
   );
 };
@@ -188,6 +211,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
   },
+  unavailableCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+
+  unavailableText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+
 });
 
 export { MyPartCard };
