@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity, Platform, useColorScheme } from 'react-native';
+import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity, Platform, useColorScheme, View, Scrollview } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
@@ -98,27 +98,39 @@ const SearchPage: React.FC = () => {
     return (
 
         <ParallaxScrollView
-          headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+          headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
+          contentBackgroundColor="white"
           headerImage={
-            <Image
-              source={{ uri: 'https://via.placeholder.com/100' }}  // Example placeholder image
-              style={styles.logo}
-            />
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('@/assets/images/fraunhofer.png')}
+                style={styles.logo}
+              />
+            </View>
           }
         >
           <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Stock Management</ThemedText>
+            <ThemedText type="title" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>
+              Search
+            </ThemedText>
           </ThemedView>
 
-            <TextInput
-                    style={styles.searchBar}
-                    placeholder="Search items..."
-                    value={searchQuery}
-                    onChangeText={handleSearch}
-                  />
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearchButtonPress}>
-                  <Icon name="search" size={20}  color={colorScheme === 'dark' ? '#fff' : '#1D3D47'}  />
-            </TouchableOpacity>
+          <View style={styles.searchContainer}>
+          <TextInput
+                style={[
+                  styles.searchBar,
+                  { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }, // Input text color
+                ]}
+                placeholder="Search for parts..."
+                value={searchQuery}
+                onChangeText={handleSearch}
+                placeholderTextColor={colorScheme === 'dark' ? '#aaa' : '#999'}
+          />
+              <TouchableOpacity style={styles.searchButton} onPress={handleSearchButtonPress}>
+                <Icon name="search" size={20} color={'#00a481'} />
+              </TouchableOpacity>
+          </View>
+
           {loading ? (
             <ActivityIndicator size="large" color="#000" style={styles.loader} />
           ) : (
@@ -141,13 +153,26 @@ const SearchPage: React.FC = () => {
     }
 
     const styles = StyleSheet.create({
+      headerText: {
+        fontSize: 28,
+        fontWeight: '600',
+        textAlign: 'center',
+      },
       titleContainer: {
         alignItems: 'center',
         marginVertical: 16,
       },
+      logoContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 250,
+        flexDirection: 'column',
+      },
       logo: {
         height: 100,
-        width: 100,
+        width: '80%',
+        borderRadius: 10,
+        marginBottom: 16,
       },
       loader: {
         marginTop: 20,
@@ -155,13 +180,27 @@ const SearchPage: React.FC = () => {
       cardContainer: {
         padding: 16,
       },
-      searchBar: {
-            height: 40,
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 8,
-            paddingHorizontal: 10,
-            marginBottom: 10,
+      searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        paddingHorizontal: 16,
       },
+      searchBar: {
+        flex: 1,
+        height: 40,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        paddingHorizontal: 10,
+      },
+      searchButton: {
+        marginLeft: 10,
+        padding: 10,
+        borderRadius: 8,
+        //backgroundColor: '#C2F0E0',
+
+      },
+
     });
 export default SearchPage;

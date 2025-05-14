@@ -1,6 +1,8 @@
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform, TouchableOpacity, View, StyleSheet, useColorScheme } from "react-native";
+import { Platform, TouchableOpacity, View, StyleSheet, useColorScheme} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import React from "react";
 
 export default function CategoryDetailLayout() {
   const colorScheme = useColorScheme(); // Get the current color scheme (light/dark)
@@ -12,36 +14,40 @@ export default function CategoryDetailLayout() {
   };
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: true,
-        headerTintColor: colorScheme === "dark" ? "white" : "black", // Dynamic text color based on theme
-        headerStyle: { backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "white" }, // Dynamic header background color
-        headerTitleStyle: { fontWeight: "bold" },
-        headerBackTitleVisible: false,
-      }}
-    >
-      <Stack.Screen
-        name="[id]"
-        options={{
-          title: "Category Details",
-          headerLeft: () => (
-            <View style={styles.headerLeftContainer}>
-              <TouchableOpacity
-                onPressIn={handleBackPress}  // Trigger the back action on press in
-                style={styles.backButton}
-              >
-                <Ionicons
-                  name={backIcon}
-                  size={25}
-                  color={colorScheme === "dark" ? "white" : "black"} // Dynamic icon color based on theme
-                />
-              </TouchableOpacity>
-            </View>
-          ),
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack
+        screenOptions={{
+          headerShown: true,
+          headerTintColor: colorScheme === "dark" ? "white" : "black", // Dynamic text color based on theme
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "white"
+          },
+          headerTitleStyle: { fontWeight: "bold" },
+          headerBackTitleVisible: false,
         }}
-      />
-    </Stack>
+      >
+        <Stack.Screen
+          name="[id]"
+          options={{
+            title: "Category Details",
+            headerLeft: () => (
+              <View style={styles.headerLeftContainer}>
+                <TouchableOpacity
+                  onPressIn={handleBackPress}
+                  style={styles.backButton}
+                >
+                  <Ionicons
+                    name={backIcon}
+                    size={25}
+                    color={colorScheme === "dark" ? "white" : "black"}
+                  />
+                </TouchableOpacity>
+              </View>
+            ),
+          }}
+        />
+      </Stack>
+    </SafeAreaView>
   );
 }
 

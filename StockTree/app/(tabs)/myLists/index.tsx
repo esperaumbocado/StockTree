@@ -70,14 +70,22 @@ export default function MyListsScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        {lists.map((list) => (
-          <MyListCard
-            key={list.id}
-            title={list.name}
-            itemCount={list.items.length}
-            onPress={() => handlePress(list.id)} // ✅ Correct!
-          />
-        ))}
+        {lists.length === 0 ? (
+          <Text style={styles.empty}>
+            You have no lists
+          </Text>
+        ) : (
+          lists.map((list) => (
+            <MyListCard
+              key={list.id}
+              id={list.id}
+              title={list.name}
+              itemCount={list.items.length}
+              onPress={() => handlePress(list.id)}
+            />
+          ))
+        )}
+
       </ScrollView>
 
       {/* FAB */}
@@ -179,6 +187,12 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  empty: {
+    textAlign: 'center',
+    color: '#666',
+    marginTop: 20,
+    fontSize: 16,
   },
 });
 

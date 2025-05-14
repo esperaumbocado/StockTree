@@ -4,6 +4,14 @@ import { Link } from 'expo-router';
 
 const CategoryCard = ({ name, description, partCount, icon, categoryId }) => {
   const colorScheme = useColorScheme();
+/*  console.log('CategoryCard info:', {
+    name,
+    description,
+    partCount,
+    icon,
+    categoryId,
+  });
+*/
 
   return (
     <View style={styles.cardContainer}>
@@ -25,10 +33,19 @@ const CategoryCard = ({ name, description, partCount, icon, categoryId }) => {
                 },
               ]}
             >
-              {icon && <Image source={{ uri: icon }} style={styles.icon} />}
-              <Text style={[styles.name, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
-              <Text style={[styles.description, { color: colorScheme === 'dark' ? '#ccc' : '#777' }]}>{description}</Text>
-              <Text style={[styles.partCount, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>Parts: {partCount}</Text>
+                {name && description && partCount != null ? (
+                  <>
+                    {/*{icon && <Image source={{ uri: icon }} style={styles.icon} />}*/}
+                    <Text style={[styles.name, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
+                    <Text style={[styles.description, { color: colorScheme === 'dark' ? '#ccc' : '#777' }]}>{description}</Text>
+                    <Text style={[styles.partCount, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>Parts: {partCount}</Text>
+                  </>
+                ) : (
+                  <Text style={{ color: 'red', fontSize: 16 }}>
+                    Category data incomplete.
+                  </Text>
+                )}
+
             </View>
           )}
         </Pressable>

@@ -1,47 +1,53 @@
 import { Stack, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform, TouchableOpacity, View, StyleSheet, useColorScheme, Button } from "react-native";
-import React, { useState } from "react";
-
+import { Platform, TouchableOpacity, View, StyleSheet, useColorScheme} from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PartDetailLayout() {
   const colorScheme = useColorScheme(); // Get the current color scheme (light/dark)
   const backIcon = Platform.OS === "ios" ? "chevron-back" : "arrow-back-sharp";
 
-
   const handleBackPress = () => {
     console.log("Back button pressed");
-    router.replace('/myLists');
+    router.replace("/myLists");
   };
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: true,
-        headerTintColor: colorScheme === "dark" ? "white" : "black",
-        headerStyle: { backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "white" },
-        headerTitleStyle: { fontWeight: "bold" },
-        headerBackTitleVisible: false,
-      }}
-    >
-      <Stack.Screen
-        name="[id]"
-        options={{
-          title: "List Details",
-          headerLeft: () => (
-            <View style={styles.headerLeftContainer}>
-              <TouchableOpacity onPressIn={handleBackPress} style={styles.backButton}>
-                <Ionicons
-                  name={backIcon}
-                  size={25}
-                  color={colorScheme === "dark" ? "white" : "black"}
-                />
-              </TouchableOpacity>
-            </View>
-          ),
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack
+        screenOptions={{
+          headerShown: true,
+          headerTintColor: colorScheme === "dark" ? "white" : "black",
+          headerStyle: {
+            backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "white",
+          },
+          headerTitleStyle: { fontWeight: "bold" },
+          headerBackTitleVisible: false,
         }}
-      />
-    </Stack>
+      >
+        <Stack.Screen
+          name="[id]"
+          options={{
+            title: "List Details",
+            headerLeft: () => (
+              <View style={styles.headerLeftContainer}>
+                <TouchableOpacity
+                  onPressIn={handleBackPress}
+                  style={styles.backButton}
+                >
+                  <Ionicons
+                    name={backIcon}
+                    size={25}
+                    color={colorScheme === "dark" ? "white" : "black"}
+                  />
+                </TouchableOpacity>
+              </View>
+            ),
+          }}
+        />
+      </Stack>
+    </SafeAreaView>
   );
 }
 
@@ -56,4 +62,3 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-

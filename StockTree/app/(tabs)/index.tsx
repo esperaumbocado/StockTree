@@ -13,7 +13,7 @@ import { useRouter } from 'expo-router';
 
 
 export default function HomeScreen({ navigation }) {
-  const router = useRouter(); // ✅ Define router
+  const router = useRouter(); // Define router
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiUrl, setApiUrl] = useState('');
