@@ -28,13 +28,7 @@ export default function TabLayout() {
           default: {},
         }),
     }}>
-    <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-    />
+
     <Tabs.Screen
         name="explore"
         options={{
@@ -47,6 +41,13 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
+        }}
+    />
+    <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Categories',
+          tabBarIcon: ({ color }) => <FontAwesome name="th-large" size={28} color={color} />,
         }}
     />
     <Tabs.Screen
@@ -69,7 +70,6 @@ export default function TabLayout() {
       options={{
         title: 'Category Detail',
         href: null,
-        tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
       }}
     />
     <Tabs.Screen
@@ -77,7 +77,6 @@ export default function TabLayout() {
       options={{
         title: 'Part Detail',
         href: null,
-        tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
       }}
     />
     <Tabs.Screen
@@ -88,6 +87,12 @@ export default function TabLayout() {
     />
     <Tabs.Screen
       name="myPartsList"
+      options={{
+        href: null, // hides it from the tab bar
+      }}
+    />
+    <Tabs.Screen
+      name="index"
       options={{
         href: null, // hides it from the tab bar
       }}

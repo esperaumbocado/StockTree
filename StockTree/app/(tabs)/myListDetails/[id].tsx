@@ -4,16 +4,15 @@ import { Alert, Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { ActivityIndicator, ScrollView, View, Text, StyleSheet, TouchableOpacity, useColorScheme } from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
-
 import { useFocusEffect } from '@react-navigation/native';
 import { MyPartCard } from '@/components/MyPartCard';
 import {ThemedText} from '@/components/ThemedText';
-
+import { loadToken,  } from '@/utils/utils';
 
 
 export default function MyListParts(){
     const { id: listId } = useLocalSearchParams();
-
+    const [token, setToken] = useState('');
     const [apiUrl, setApiUrl] = useState('');
     const [myList, setMyList] = useState(null);
     const [myParts, setMyParts] = useState([]);
@@ -44,6 +43,14 @@ export default function MyListParts(){
       }
     };
 
+    const defToken = async () => {
+      const storedToken = await loadToken();
+      if( storedToken){
+          setToken(storedToken);
+          console.log('TOKEN:', storedToken);
+      }
+    };
+
     const loadApiUrl = async () => {
         try {
           let storedUrl;
@@ -64,6 +71,7 @@ export default function MyListParts(){
 
     // Get parts from ids
     const fetchMultipleParts = async (ids: number[], apiUrl: string, token: string) => {
+        if( !apiUrl || !token) return;
         try {
           const partPromises = ids.map(id =>
             fetch(`${apiUrl}/api/part/${id}/`, {
@@ -100,6 +108,7 @@ export default function MyListParts(){
 
     // Get stockItem from stockId
     const fetchStockItems = async (ids: number[], apiUrl: string, token: string) => {
+      if( !apiUrl || !token) return;
       try {
         const fetchPromises = ids.map(async (id) => {
           try {
@@ -156,6 +165,7 @@ export default function MyListParts(){
     };
 
     const fetchMyListParts = async () => {
+        if( !apiUrl || !token) return;
         try {
             const partAssociations = getMyListPartIds();
 
@@ -169,8 +179,8 @@ export default function MyListParts(){
 
             setLoading(true);
 
-            const parts = await fetchMultipleParts(partIds, apiUrl, 'inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321');
-            const stockItems = await fetchStockItems(stockIds, apiUrl, 'inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321');
+            const parts = await fetchMultipleParts(partIds, apiUrl, `${token}`);
+            const stockItems = await fetchStockItems(stockIds, apiUrl, `${token}`);
 
             // Build lookup maps
             const partMap = new Map(parts.map(part => [part.pk, part]));
@@ -225,13 +235,6 @@ export default function MyListParts(){
         await setMyListParts();
       };
 
-    useEffect(() => {
-      console.log('MyListParts mounted');
-
-      return () => {
-        console.log('MyListParts unmounted');
-      };
-    }, []);
 
     useEffect(() => {
       refreshData();
@@ -239,7 +242,7 @@ export default function MyListParts(){
 
     useEffect(() => {
       setUpMyList();
-    }, [apiUrl]); // runs when there are changes in myList
+    }, [apiUrl]); // runs when there are changes in apiUrl
 
 
 
@@ -247,12 +250,14 @@ export default function MyListParts(){
       useCallback(() => {
         const loadApiData = async () => {
                 await loadApiUrl();
+                await defToken();
         };
         const loadData = async () => {await setUpMyList();};
         loadApiData();
+
         loadData();
       }, [])
-    );
+    );  // runs when the screen is focused
 
     const handleRemoveSelected = async () => {
         if (myParts.length > 0) {

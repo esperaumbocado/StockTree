@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -7,6 +7,9 @@ import CategoryCard from '@/components/CategoryCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PartCard } from '@/components/PartCard'; // Import PartCard component
+import { loadToken,  } from '@/utils/utils';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 export default function DetailsScreen() {
   const { id, categoryName } = useLocalSearchParams(); // Get the category ID and name from params
@@ -14,7 +17,16 @@ export default function DetailsScreen() {
   const [subcategories, setSubcategories] = useState([]);
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState('');
   const [apiUrl, setApiUrl] = useState(''); // Define apiUrl state
+
+  const defToken = async () => {
+    const storedToken = await loadToken();
+    if( storedToken){
+        setToken(storedToken);
+        console.log('TOKEN:', storedToken);
+    }
+  };
 
   // Load the API URL from SecureStore or AsyncStorage depending on the platform
   const loadApiUrl = async () => {
@@ -37,11 +49,9 @@ export default function DetailsScreen() {
   };
 
   const fetchParts = async () => {
+    if( !apiUrl || !token) return;
     try {
       setLoading(true);
-      await loadApiUrl();
-      if (!apiUrl) return;
-
       const params = new URLSearchParams({
         category: id,
       });
@@ -53,7 +63,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+          Authorization: `Token ${token}`,
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -113,13 +123,9 @@ export default function DetailsScreen() {
 
   // Fetch subcategories of the current category
   const fetchSubcategories = async () => {
+    if( !apiUrl || !token){ return;}
     try {
       setLoading(true);
-
-      if (!apiUrl) {
-        console.error('API URL is not set.');
-        return;
-      }
 
       console.log('API URL:', apiUrl);
 
@@ -134,12 +140,6 @@ export default function DetailsScreen() {
 
       const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;
 
-      console.log('Request Headers:', {
-        Authorization: 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
-        Accept: 'application/json',
-        Connection: 'keep-alive',
-        Host: 'inventree.localhost',
-      });
 
       const response = await fetch(apiEndpoint, {
         method: 'GET',
@@ -201,16 +201,25 @@ export default function DetailsScreen() {
 
   // Load API URL when the component mounts
   useEffect(() => {
+    defToken();
     loadApiUrl();
+
   }, []);
 
   // Fetch subcategories and parts when apiUrl or category ID changes
   useEffect(() => {
-    if (apiUrl) {
+    if (apiUrl && token ) {
       fetchSubcategories();
       fetchParts();
     }
-  }, [apiUrl, id]);
+  }, [apiUrl, token, id]);
+
+  useFocusEffect(
+    useCallback(() => {
+        loadApiUrl();
+        defToken();
+    }, [])
+  );  // runs when the screen is focused
 
   return (
     <ScrollView style={{ flex: 1 }}>

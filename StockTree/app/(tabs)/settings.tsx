@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, useColorScheme, Platform } from 'react-native';
+import { View, Text, TextInput, Button, Alert, StyleSheet, useColorScheme, Platform, ScrollView } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
   const [apiUrl, setApiUrl] = useState('');
+  const [adminToken, setAdminToken] = useState('');
   const colorScheme = useColorScheme();  // Get the current theme (light or dark)
 
   // Load API URL when the screen opens
@@ -13,7 +14,12 @@ export default function SettingsScreen() {
       const storedUrl = await getApiUrl();
       if (storedUrl) setApiUrl(storedUrl);
     };
+    const loadToken = async () => {
+      const storedToken = await getToken();
+      if (storedToken) setAdminToken(storedToken);
+    };
     loadApiUrl();
+    loadToken();
   }, []);
 
   // Save API URL based on platform
@@ -49,22 +55,70 @@ export default function SettingsScreen() {
     }
   };
 
+  // Save Admin Token based on platform
+  const saveToken = async () => {
+    try {
+      console.log('Current token: ', adminToken);
+      await saveTokenToStorage('TOKEN', adminToken);
+      Alert.alert('Success', 'Token saved!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save Token.');
+    }
+  };
+
+  // Save Admin Token to storage (asyncStorage for web, secureStore for mobile)
+  const saveTokenToStorage = async (key: string, value: string) => {
+    if (Platform.OS === 'web') {
+      await AsyncStorage.setItem(key, value);
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  };
+
+  // Get token from storage (asyncStorage for web, secureStore for mobile)
+  const getToken = async () => {
+    try {
+      if (Platform.OS === 'web') {
+        return await AsyncStorage.getItem('TOKEN');
+      } else {
+        return await SecureStore.getItemAsync('TOKEN');
+      }
+    } catch (error) {
+      console.error('Error retrieving data:', error);
+      return null;
+    }
+  };
+
   // Dynamic styles based on the current theme
   const styles = getStyles(colorScheme);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>API URL:</Text>
-      <TextInput
-        style={styles.input}
-        value={apiUrl}
-        onChangeText={setApiUrl}
-        placeholder="Enter API URL"
-        placeholderTextColor={colorScheme === 'dark' ? '#aaa' : '#888'} // Lighter placeholder text for dark mode
-        autoCapitalize="none"
-      />
-      <Button title="Save" onPress={saveApiUrl} />
-    </View>
+    <ScrollView>
+        <View style={styles.container}>
+          <Text style={styles.label}>API URL:</Text>
+          <TextInput
+            style={styles.input}
+            value={apiUrl}
+            onChangeText={setApiUrl}
+            placeholder="Enter API URL"
+            placeholderTextColor={colorScheme === 'dark' ? '#aaa' : '#888'} // Lighter placeholder text for dark mode
+            autoCapitalize="none"
+          />
+          <Button title="Save api url" onPress={saveApiUrl} />
+        </View>
+        <View style={styles.container}>
+          <Text style={styles.label}>TOKEN:</Text>
+          <TextInput
+            style={styles.input}
+            value={adminToken}
+            onChangeText={setAdminToken}
+            placeholder="Enter token"
+            placeholderTextColor={colorScheme === 'dark' ? '#aaa' : '#888'} // Lighter placeholder text for dark mode
+            autoCapitalize="none"
+          />
+          <Button title="Save token" onPress={saveToken} />
+        </View>
+    </ScrollView>
   );
 }
 

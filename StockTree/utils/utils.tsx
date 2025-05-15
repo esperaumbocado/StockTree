@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {Alert } from "react-native";
+import {Alert, Platform } from "react-native";
 
-  export const fetchStockItemsForPart = async(partId, apiUrl) => {
+  export const fetchStockItemsForPart = async(partId, apiUrl, token) => {
         try {
             const params = new URLSearchParams();
             params.append('part', partId);
@@ -10,7 +10,7 @@ import {Alert } from "react-native";
             const response = await fetch(apiEndpoint, {
                 method: 'GET',
                 headers: {
-                  'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+                  'Authorization': `Token ${token}`,
                   'Accept': 'application/json',
                   'Connection': 'keep-alive',
                   //'Content-Type': 'application/json',
@@ -179,3 +179,25 @@ import {Alert } from "react-native";
       console.error('Error removing stock:', error.message);
     }
   };
+
+
+  // LOAD TOKEN
+  export  const loadToken = async () => {
+      try {
+        let storedToken;
+        if (Platform.OS === 'web') {
+          storedToken = await AsyncStorage.getItem('TOKEN');
+        } else {
+          storedUrl = await SecureStore.getItemAsync('TOKEN');
+        }
+
+        if (storedToken) {
+
+          console.log('TOKEN:', storedToken);
+          return( storedToken);
+        }
+      } catch (error) {
+        console.error('Error loading TOKEN:', error);
+      }
+      return null;
+    };

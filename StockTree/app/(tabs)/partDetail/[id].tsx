@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform, TouchableOpacity, Modal } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -7,44 +7,64 @@ import ImageCard from '@/components/ImageCard';
 import StockItemCard from '@/components/StockItemCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { fetchStockItemsForPart,  } from '@/utils/utils';
+import { fetchStockItemsForPart, loadToken  } from '@/utils/utils';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function DetailsScreen() {
   const { id, partName } = useLocalSearchParams(); // Get part ID and name from params
   const colorScheme = useColorScheme();
   const [part, setPart] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState('');
   const [apiUrl, setApiUrl] = useState('');
   const [counter, setCounter] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [stockItems, setStockItems] = useState([]);
 
-  useEffect(() => {
-    const loadApiUrl = async () => {
-      try {
-        const storedUrl = Platform.OS === 'web'
-          ? await AsyncStorage.getItem('API_URL')
-          : await SecureStore.getItemAsync('API_URL');
+  const loadApiUrl = async () => {
+    try {
+      const storedUrl = Platform.OS === 'web'
+        ? await AsyncStorage.getItem('API_URL')
+        : await SecureStore.getItemAsync('API_URL');
 
-        if (storedUrl) {
-          setApiUrl(storedUrl);
-        } else {
-          console.error('API URL not found in storage.');
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error('Error loading API URL:', error.message);
+      if (storedUrl) {
+        setApiUrl(storedUrl);
+      } else {
+        console.error('API URL not found in storage.');
         setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Error loading API URL:', error.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadApiUrl();
+    defToken();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+        loadApiUrl();
+        defToken();
+    }, [])
+  );  // runs when the screen is focused
+
+  const defToken = async () => {
+    const storedToken = await loadToken();
+    if( storedToken){
+        setToken(storedToken);
+        console.log('TOKEN:', storedToken);
+    }
+  };
+
   const handleCheckStockLocations = async () => {
+        if( !apiUrl || !token) return;
         try {
           setLoading(true);
           // function that makes API call to get stock items for the part
-          const fetchedStockItems = await fetchStockItemsForPart(part.id, apiUrl);
+          const fetchedStockItems = await fetchStockItemsForPart(part.id, apiUrl, token);
           // Set the fetched stock items to the state
           setStockItems(fetchedStockItems);
           setLoading(false);
@@ -54,6 +74,7 @@ export default function DetailsScreen() {
   };
 
   const fetchPart = async () => {
+      if(!apiUrl || !token) return;
       try {
         setLoading(true);
 
@@ -62,7 +83,7 @@ export default function DetailsScreen() {
         const response = await fetch(apiEndpoint, {
           method: 'GET',
           headers: {
-            Authorization: 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+            Authorization: `Token ${token}`,
             Accept: 'application/json',
             Connection: 'keep-alive',
             Host: 'inventree.localhost',
@@ -92,10 +113,10 @@ export default function DetailsScreen() {
   };
 
   useEffect(() => {
-    if (!apiUrl) return;
+    if (!apiUrl || !token) return;
 
     fetchPart();
-  }, [apiUrl, id]);
+  }, [apiUrl, token, id]);
 
   useEffect(() => {
     if (part) {
@@ -110,11 +131,12 @@ export default function DetailsScreen() {
     }
   };
   const handleRemoveStock = async (counter, stockItem) => {
+    if( !apiUrl || !token) return;
     try {
       const response = await fetch(`${apiUrl}/api/stock/remove/`, {
         method: 'POST',
         headers: {
-          'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+          'Authorization': `Token ${token}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
@@ -163,7 +185,7 @@ export default function DetailsScreen() {
               </Text>
               <ImageCard
                 imageLink={part.image}
-                token="inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321"
+                token={token}
               />
 
               {stockItems && stockItems.length > 0 ? (<View>
