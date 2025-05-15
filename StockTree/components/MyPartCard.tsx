@@ -17,6 +17,7 @@ const MyPartCard = ({
   apiUrl,
   refreshData,
   isUnavailable = false,
+  token,
 }) => {
   const colorScheme = useColorScheme();
 
@@ -56,7 +57,7 @@ const MyPartCard = ({
       ) : (
 
       <View style={[styles.card]}>
-        <ImageCard imageLink={image} />
+        <ImageCard imageLink={image} token={token} />
         <Text style={[styles.title, { color: textColor }]}>{name}</Text>
         <Text style={[styles.details, { color: detailsColor }]}>{stockName}</Text>
         <Text style={[styles.details, { color: detailsColor }]}>{stock} in stock </Text>

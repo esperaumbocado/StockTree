@@ -7,7 +7,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchStockItemsForPart, addPart, getMyLists, addPartToList } from '@/utils/utils';
 
-const PartCard = ({name, stock, image, partId, apiUrl}) => {
+const PartCard = ({name, stock, image, partId, apiUrl, token}) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -19,14 +19,17 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
   const [lists, setLists] = useState([]);
 
 
+  console.log('PartCard apiUrl:', apiUrl);
+  console.log('PartCard token:', token);
+
   const SELECTED_PARTS_KEY = "selected_parts";
 
   // HANDLE ADDING PART
   const handleAddPart = async () => {
     try {
-        const stockItems = await fetchStockItemsForPart(partId, apiUrl);
+        const stockItems = await fetchStockItemsForPart(partId, apiUrl, token);
         // Error, no stock locations found for part
-        if (stockItems.length < 1){
+        if ( !stockItems || stockItems.length < 1){
           Alert.alert("Not found", "No locations associated with this part were found.");
           return;
         }
@@ -49,7 +52,7 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
 
   const handleAddPartToList = async () => {
       try {
-          const stockItems = await fetchStockItemsForPart(partId, apiUrl);
+          const stockItems = await fetchStockItemsForPart(partId, apiUrl, token);
           const myLists = await getMyLists();
           // Error, no stock locations found for part
           if (stockItems.length < 1){
@@ -91,35 +94,50 @@ const PartCard = ({name, stock, image, partId, apiUrl}) => {
   return (
     <>
     <View style={styles.cardContainer}>
-      <Pressable onPress={navigateToDetails} style={({ pressed }) => [
-        styles.card,
-        {
-          backgroundColor: colorScheme === 'dark' ? '#333' : '#fff',
-          opacity: pressed ? 0.9 : 1,
-        },
-      ]}>
-        <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
-        <Text style={[styles.details, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>In stock: {stock}</Text>
-        <ImageCard imageLink={image} />
 
-        {/* Add button lives *inside* card but isn't wrapped by outer pressable */}
-        <TouchableOpacity
-          onPress={handleAddPart}
-          activeOpacity={0.5} // gives visual feedback on press
-          style={styles.addButton}
-        >
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
+        {partId && name && stock != null ? (
+          <Pressable
+            onPress={navigateToDetails}
+            style={({ pressed }) => [
+              styles.card,
+              {
+                backgroundColor: colorScheme === 'dark' ? '#333' : '#fff',
+                opacity: pressed ? 0.9 : 1,
+              },
+            ]}
+          >
+            <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>
+              {name}
+            </Text>
+            <Text style={[styles.details, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>
+              In stock: {stock}
+            </Text>
+            <ImageCard imageLink={image} token={token} />
 
-        {/* Add part to a list button  */}
-        <TouchableOpacity
-          onPress={handleAddPartToList}
-          activeOpacity={0.5} // gives visual feedback on press
-          style={styles.addButton}
-        >
-          <Text style={styles.addButtonText}>Add to a list</Text>
-        </TouchableOpacity>
-      </Pressable>
+            {/* Add button lives *inside* card but isn't wrapped by outer pressable */}
+            <TouchableOpacity
+              onPress={handleAddPart}
+              activeOpacity={0.5}
+              style={styles.addButton}
+            >
+              <Text style={styles.addButtonText}>Add</Text>
+            </TouchableOpacity>
+
+            {/* Add part to a list button */}
+            <TouchableOpacity
+              onPress={handleAddPartToList}
+              activeOpacity={0.5}
+              style={styles.addButton}
+            >
+              <Text style={styles.addButtonText}>Add to a list</Text>
+            </TouchableOpacity>
+          </Pressable>
+        ) : (
+          <Text style={[styles.warningText, { color: 'red', margin: 10 }]}>
+            Part information incomplete
+          </Text>
+        )}
+
     </View>
     {/* Modal for choosing stock location */}
     <Modal

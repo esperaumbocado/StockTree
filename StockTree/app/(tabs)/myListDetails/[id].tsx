@@ -362,6 +362,7 @@ export default function MyListParts(){
                                   apiUrl={apiUrl}
                                   refreshData={ refreshData}
                                   isUnavailable = {true}
+                                  token = {token}
                                 />
                           ) : (
 
@@ -386,7 +387,7 @@ export default function MyListParts(){
                               }}
                               apiUrl={apiUrl}
                               refreshData={ refreshData}
-
+                              token={token}
                             />
                           )}
                         </View>

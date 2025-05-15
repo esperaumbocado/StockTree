@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Card } from "react-native-paper";
 
-const ImageCard = ({ imageLink }) => {
+const ImageCard = ({ imageLink, token }) => {
   return (
     <Card style={styles.card}>
       {imageLink ? (
@@ -10,7 +10,7 @@ const ImageCard = ({ imageLink }) => {
           source={{
             uri: imageLink,
             headers: {
-              Authorization: `Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321`,
+              Authorization: `Token ${token}`,
             },
           }}
           style={styles.image}

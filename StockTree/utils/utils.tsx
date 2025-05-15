@@ -1,7 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {Alert, Platform } from "react-native";
+import * as SecureStore from 'expo-secure-store';
 
   export const fetchStockItemsForPart = async(partId, apiUrl, token) => {
+        if(!apiUrl || !token) return;
         try {
             const params = new URLSearchParams();
             params.append('part', partId);
@@ -188,7 +190,7 @@ import {Alert, Platform } from "react-native";
         if (Platform.OS === 'web') {
           storedToken = await AsyncStorage.getItem('TOKEN');
         } else {
-          storedUrl = await SecureStore.getItemAsync('TOKEN');
+          storedToken = await SecureStore.getItemAsync('TOKEN');
         }
 
         if (storedToken) {

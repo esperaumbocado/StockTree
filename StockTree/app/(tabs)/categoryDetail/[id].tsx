@@ -144,7 +144,7 @@ export default function DetailsScreen() {
       const response = await fetch(apiEndpoint, {
         method: 'GET',
         headers: {
-          Authorization: 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+          Authorization: `Token ${token}`,
           Accept: 'application/json',
           Connection: 'keep-alive',
           Host: 'inventree.localhost',
@@ -244,6 +244,7 @@ export default function DetailsScreen() {
                   partCount={partCount}
                   icon={icon}
                   categoryId={id} // Pass the subcategory ID to the card
+
                 />
               ))}
             </View>
@@ -262,6 +263,8 @@ export default function DetailsScreen() {
                   image={image}
                   //description={description} // Use imageUrl as per your logic
                   partId={id}
+                  apiUrl={apiUrl}
+                  token={token}
                 />
               ))}
             </View>

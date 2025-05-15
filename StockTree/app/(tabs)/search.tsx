@@ -148,7 +148,7 @@ const SearchPage: React.FC = () => {
       ) : (
         <ScrollView style={styles.cardContainer}>
           {results.map(({ id, name, stock, image }) => (
-            <PartCard key={id} name={name} stock={stock} image={image} partId={id} apiUrl={apiUrl} />
+            <PartCard key={id} name={name} stock={stock} image={image} partId={id} apiUrl={apiUrl} token={token} />
           ))}
           {hasMore && !loading && (
             <TouchableOpacity onPress={() => fetchSearchResults(false)} style={styles.loadMoreButton}>

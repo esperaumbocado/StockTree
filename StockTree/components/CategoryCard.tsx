@@ -4,14 +4,13 @@ import { Link } from 'expo-router';
 
 const CategoryCard = ({ name, description, partCount, icon, categoryId }) => {
   const colorScheme = useColorScheme();
-/*  console.log('CategoryCard info:', {
+  console.log('CategoryCard info:', {
     name,
     description,
     partCount,
     icon,
     categoryId,
   });
-*/
 
   return (
     <View style={styles.cardContainer}>
@@ -33,11 +32,11 @@ const CategoryCard = ({ name, description, partCount, icon, categoryId }) => {
                 },
               ]}
             >
-                {name && description && partCount != null ? (
+                {name &&  partCount != null ? (
                   <>
                     {/*{icon && <Image source={{ uri: icon }} style={styles.icon} />}*/}
                     <Text style={[styles.name, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
-                    <Text style={[styles.description, { color: colorScheme === 'dark' ? '#ccc' : '#777' }]}>{description}</Text>
+                    <Text style={[styles.description, { color: colorScheme === 'dark' ? '#ccc' : '#777' }]}>{description ? description : 'No description available'}</Text>
                     <Text style={[styles.partCount, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>Parts: {partCount}</Text>
                   </>
                 ) : (
