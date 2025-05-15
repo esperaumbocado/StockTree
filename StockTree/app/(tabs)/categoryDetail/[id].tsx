@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,6 +19,9 @@ export default function DetailsScreen() {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState('');
   const [apiUrl, setApiUrl] = useState(''); // Define apiUrl state
+  const [offset, setOffset] = useState(0);
+  const [limit] = useState(10);
+  const [hasMore, setHasMore] = useState(false);
 
   const defToken = async () => {
     const storedToken = await loadToken();
@@ -52,8 +55,11 @@ export default function DetailsScreen() {
     if( !apiUrl || !token) return;
     try {
       setLoading(true);
+      const currentOffset = offset;
       const params = new URLSearchParams({
         category: id,
+        limit: limit.toString(),
+        offset: offset.toString(),
       });
 
       console.log('Request Params (Parts): ', params.toString());
@@ -87,8 +93,8 @@ export default function DetailsScreen() {
       console.log("Parsed Data (Parts): ", data);
 
       let fetchedParts;
-      if (Array.isArray(data)) {
-        fetchedParts = data.map((item) => {
+      if (!Array.isArray(data)) {
+        fetchedParts = data.results.map((item) => {
           const imageUrl = item.image ? `${apiUrl}${item.image}` : null;
           return {
             id: item.pk,
@@ -99,6 +105,7 @@ export default function DetailsScreen() {
           };
         });
       } else {
+        console.log("AAAAAAAAAaa");
         const imageUrl = data.image ? `${apiUrl}${data.image}` : null;
         fetchedParts = [
           {
@@ -110,8 +117,15 @@ export default function DetailsScreen() {
           },
         ];
       }
+      console.log('PARTS1:', data);
+      setParts(prev =>  [...prev, ...fetchedParts]);
+      console.log('PARTS:', fetchedParts);
+      setOffset(currentOffset + limit);
+      console.log('currentOffset, limit:', currentOffset, limit);
+      console.log('data.next:', data.next);
+      setHasMore(Boolean(data.next));
 
-      setParts(fetchedParts);
+      //setParts(fetchedParts);
     } catch (error) {
       console.error('Error fetching parts:', error.message);
     } finally {
@@ -253,21 +267,30 @@ export default function DetailsScreen() {
           )}
 
           {parts.length > 0 ? (
-            <View>
+            <ScrollView>
               <ThemedText style={styles.partsHeader}>Parts</ThemedText>
-              {parts.map(({ id, name, description, image, stock, partId }) => (
-                <PartCard
-                  key={id}
-                  name={name}
-                  stock={stock}
-                  image={image}
-                  //description={description} // Use imageUrl as per your logic
-                  partId={id}
-                  apiUrl={apiUrl}
-                  token={token}
-                />
-              ))}
-            </View>
+
+                {parts.map((part, index) => {
+                  console.log('Rendering PartCard with id:', part.id); // 👈 Log part id here
+                  return (
+                    <PartCard
+                      key={part.id ?? `part-${index}`}
+                      name={part.name}
+                      stock={part.stock}
+                      image={part.image}
+                      partId={part.id}
+                      apiUrl={apiUrl}
+                      token={token}
+                    />
+                  );
+                })}
+
+              {hasMore && !loading && (
+                <TouchableOpacity onPress={() => fetchParts()} style={styles.loadMoreButton}>
+                  <ThemedText style={styles.loadMoreText}>Load More</ThemedText>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
           ) : (
             <ThemedText style={styles.noResults}>No parts found.</ThemedText>
           )}
@@ -308,6 +331,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     marginTop: 20,
+  },
+  loadMoreButton: {
+    marginTop: 20,
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#C2F0E0',
+  },
+  loadMoreText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1D3D47',
   },
 });
 
