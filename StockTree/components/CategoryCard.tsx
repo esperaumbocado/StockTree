@@ -4,13 +4,6 @@ import { Link } from 'expo-router';
 
 const CategoryCard = ({ name, description, partCount, icon, categoryId }) => {
   const colorScheme = useColorScheme();
-  console.log('CategoryCard info:', {
-    name,
-    description,
-    partCount,
-    icon,
-    categoryId,
-  });
 
   return (
     <View style={styles.cardContainer}>

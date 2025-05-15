@@ -10,6 +10,8 @@ import CategoryCard from '@/components/CategoryCard';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { loadToken,  } from '@/utils/utils';
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function Categories() {
   const router = useRouter(); // Define router
@@ -76,6 +78,7 @@ export default function Categories() {
       }));
 
       setCategories(fetchedCategories);
+      console.log('fetchedCATGS: ', fetchedCategories);
     } catch (error) {
       console.error('Error fetching categories:', error.message);
     } finally {
@@ -122,6 +125,7 @@ export default function Categories() {
   );
 
   return (
+      <SafeAreaView style={{ flex: 1 }}>
       <ScrollView
 
       >
@@ -161,6 +165,7 @@ export default function Categories() {
           </View>
         )}
       </ScrollView>
+      </SafeAreaView>
     );
 }
 

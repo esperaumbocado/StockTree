@@ -85,12 +85,7 @@ export default function TabLayout() {
         href: null, // hides it from the tab bar
       }}
     />
-    <Tabs.Screen
-      name="myPartsList"
-      options={{
-        href: null, // hides it from the tab bar
-      }}
-    />
+
     <Tabs.Screen
       name="index"
       options={{

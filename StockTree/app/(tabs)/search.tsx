@@ -9,6 +9,7 @@ import { PartCard } from '@/components/PartCard';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { loadToken,  } from '@/utils/utils';
 import { useFocusEffect } from '@react-navigation/native';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const SearchPage: React.FC = () => {
@@ -114,6 +115,7 @@ const SearchPage: React.FC = () => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
       contentBackgroundColor="white"
@@ -159,6 +161,7 @@ const SearchPage: React.FC = () => {
         </ScrollView>
       )}
     </ParallaxScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, useColorScheme, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, Alert, StyleSheet, useColorScheme, Platform, ScrollView, StatusBar} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function SettingsScreen() {
   const [apiUrl, setApiUrl] = useState('');
@@ -93,6 +95,12 @@ export default function SettingsScreen() {
   const styles = getStyles(colorScheme);
 
   return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0,
+      }}
+    >
     <ScrollView>
         <View style={styles.container}>
           <Text style={styles.label}>API URL:</Text>
@@ -119,6 +127,7 @@ export default function SettingsScreen() {
           <Button title="Save token" onPress={saveToken} />
         </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

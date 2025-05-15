@@ -81,7 +81,6 @@ export default function DetailsScreen() {
       }
 
       const rawData = await response.text();
-      console.log('Raw Response (Parts):', rawData);
 
       let data;
       try {
@@ -93,6 +92,17 @@ export default function DetailsScreen() {
       console.log("Parsed Data (Parts): ", data);
 
       let fetchedParts;
+      fetchedParts = data.results.map((item) => {
+        const imageUrl = item.image ? `${apiUrl}${item.image}` : null;
+         return {
+          id: item.pk,
+          name: item.name,
+          description: item.description,
+          image: imageUrl,
+           stock: item.in_stock,
+        };
+      });
+/*
       if (!Array.isArray(data)) {
         fetchedParts = data.results.map((item) => {
           const imageUrl = item.image ? `${apiUrl}${item.image}` : null;
@@ -105,7 +115,6 @@ export default function DetailsScreen() {
           };
         });
       } else {
-        console.log("AAAAAAAAAaa");
         const imageUrl = data.image ? `${apiUrl}${data.image}` : null;
         fetchedParts = [
           {
@@ -117,12 +126,9 @@ export default function DetailsScreen() {
           },
         ];
       }
-      console.log('PARTS1:', data);
+*/
       setParts(prev =>  [...prev, ...fetchedParts]);
-      console.log('PARTS:', fetchedParts);
       setOffset(currentOffset + limit);
-      console.log('currentOffset, limit:', currentOffset, limit);
-      console.log('data.next:', data.next);
       setHasMore(Boolean(data.next));
 
       //setParts(fetchedParts);
@@ -170,7 +176,6 @@ export default function DetailsScreen() {
       }
 
       const rawData = await response.text();
-      console.log('Raw Response:', rawData); // Log the raw response
 
       let data;
       try {
@@ -271,7 +276,7 @@ export default function DetailsScreen() {
               <ThemedText style={styles.partsHeader}>Parts</ThemedText>
 
                 {parts.map((part, index) => {
-                  console.log('Rendering PartCard with id:', part.id); // 👈 Log part id here
+
                   return (
                     <PartCard
                       key={part.id ?? `part-${index}`}

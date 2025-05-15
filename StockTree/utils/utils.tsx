@@ -116,40 +116,6 @@ import * as SecureStore from 'expo-secure-store';
   };
 
 
-  // Store part info
-  export const addPart = async (partId, stockLocationId, SELECTED_PARTS_KEY) => {
-    console.log('stockLocationId: ', stockLocationId);
-    try {
-      //await AsyncStorage.setItem(SELECTED_PARTS_KEY, JSON.stringify([]));
-      const stored = await AsyncStorage.getItem(SELECTED_PARTS_KEY);
-      const now = Date.now();
-
-      let current = stored ? JSON.parse(stored) : [];
-
-      // Remove expired
-      //current = current.filter(item => now - item.timestamp < 86400000);
-
-      const alreadyAdded = current.some(item =>  item.partId === partId && item.stockLocationId === stockLocationId);
-      if (alreadyAdded) {
-        Alert.alert("Already added", "This part is already selected.");
-        return;
-      }
-
-      current.push({
-        partId,
-        timestamp: now,
-        stockLocationId,
-
-      });
-      console.log("Selected Parts (about to be saved):", current);
-      await AsyncStorage.setItem(SELECTED_PARTS_KEY, JSON.stringify(current));
-      Alert.alert("Success", "Part added to selected parts");
-    } catch (err) {
-      console.error("Add failed:", err);
-      Alert.alert("Error", "Could not add part.");
-    }
-  };
-
   // Update the stock of the stockItem
   export const handleRemoveStock = async (apiUrl: string, counter: number, stockItemId: integer, refreshData: ()=> void) => {
     try {

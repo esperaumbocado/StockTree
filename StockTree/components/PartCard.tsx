@@ -5,7 +5,7 @@ import { Card } from "react-native-paper";
 import ImageCard from './ImageCard';
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchStockItemsForPart, addPart, getMyLists, addPartToList } from '@/utils/utils';
+import { fetchStockItemsForPart, getMyLists, addPartToList } from '@/utils/utils';
 
 const PartCard = ({name, stock, image, partId, apiUrl, token}) => {
   const colorScheme = useColorScheme();
@@ -18,37 +18,6 @@ const PartCard = ({name, stock, image, partId, apiUrl, token}) => {
   const [selectedListId, setSelectedListId] = useState("");
   const [lists, setLists] = useState([]);
 
-
-  console.log('PartCard apiUrl:', apiUrl);
-  console.log('PartCard token:', token);
-
-  const SELECTED_PARTS_KEY = "selected_parts";
-
-  // HANDLE ADDING PART
-  const handleAddPart = async () => {
-    try {
-        const stockItems = await fetchStockItemsForPart(partId, apiUrl, token);
-        // Error, no stock locations found for part
-        if ( !stockItems || stockItems.length < 1){
-          Alert.alert("Not found", "No locations associated with this part were found.");
-          return;
-        }
-        // only one location found
-        else if (stockItems.length === 1){
-            await addPart(partId, stockItems[0].pk, SELECTED_PARTS_KEY);
-            return;
-        }
-        else{
-        // Show modal with location options
-            setLocationOptions(stockItems);
-            setShowLocationModal(true);
-        }
-    } catch (err) {
-        console.error("Error in handleAddPart:", err);
-        Alert.alert("Error", "Something went wrong while adding the part.");
-    }
-
-  };
 
   const handleAddPartToList = async () => {
       try {
@@ -115,13 +84,6 @@ const PartCard = ({name, stock, image, partId, apiUrl, token}) => {
             <ImageCard imageLink={image} token={token} />
 
             {/* Add button lives *inside* card but isn't wrapped by outer pressable */}
-            <TouchableOpacity
-              onPress={handleAddPart}
-              activeOpacity={0.5}
-              style={styles.addButton}
-            >
-              <Text style={styles.addButtonText}>Add</Text>
-            </TouchableOpacity>
 
             {/* Add part to a list button */}
             <TouchableOpacity
