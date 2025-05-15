@@ -138,6 +138,8 @@ const SearchPage: React.FC = () => {
           placeholder="Search for parts..."
           value={searchQuery}
           onChangeText={handleSearch}
+          onSubmitEditing={handleSearchButtonPress} // Trigger search on keyboard submit
+          returnKeyType="search"                    // Shows "Search" or "Done" on the keyboard
           placeholderTextColor={colorScheme === 'dark' ? '#aaa' : '#999'}
         />
         <TouchableOpacity style={styles.searchButton} onPress={handleSearchButtonPress}>

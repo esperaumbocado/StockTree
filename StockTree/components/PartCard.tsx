@@ -234,12 +234,16 @@ const styles = StyleSheet.create({
   },
   addButton: {
     marginTop: 12,
-    backgroundColor: '#1D3557',
+    backgroundColor: '#00a481',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 6,
-    alignSelf: 'flex-start',
+    alignSelf: 'stretch',        // This will allow it to grow
+    width: '100%',               // Ensures it takes the full width of the parent
+    justifyContent: 'center',    // Center the text horizontally
+    alignItems: 'center',        // Center the text vertically
   },
+
   addButtonText: {
     color: '#fff',
     fontWeight: 'bold',

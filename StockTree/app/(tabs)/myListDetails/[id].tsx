@@ -338,34 +338,6 @@ export default function MyListParts(){
 
                       return (
                         <View key={key}>
-
-                            {part.isPartMissing || part.isStockMissing ? (
-                                <MyPartCard
-                                  key={key}
-                                  name={part.name}
-                                  stock={part.available_stock}
-                                  stockLocationId={part.stockLocationId}
-                                  stockName={part.stockName}
-                                  image={part.image ? `${apiUrl}${part.image}` : null}
-                                  selectionMode={selectionMode}
-                                  isSelected={selectedParts.has(part.stockLocationId)}
-                                  onLongPress={() => setSelectionMode(true)}
-                                  onSelectToggle={() => {
-                                    const updated = new Set(selectedParts);
-                                    if (updated.has(part.stockLocationId)) {
-                                      updated.delete(part.stockLocationId);
-                                    } else {
-                                      updated.add(part.stockLocationId);
-                                    }
-                                    setSelectedParts(updated);
-                                  }}
-                                  apiUrl={apiUrl}
-                                  refreshData={ refreshData}
-                                  isUnavailable = {true}
-                                  token = {token}
-                                />
-                          ) : (
-
                             <MyPartCard
                               key={key}
                               name={part.name}
@@ -387,9 +359,9 @@ export default function MyListParts(){
                               }}
                               apiUrl={apiUrl}
                               refreshData={ refreshData}
-                              token={token}
+                              isUnavailable = {part.isPartMissing || part.isStockMissing}
+                              token = {token}
                             />
-                          )}
                         </View>
                       );
                     })}
