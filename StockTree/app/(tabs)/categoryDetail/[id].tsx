@@ -279,7 +279,7 @@ export default function DetailsScreen() {
 
                   return (
                     <PartCard
-                      key={part.id ?? `part-${index}`}
+                      key={part.id}
                       name={part.name}
                       stock={part.stock}
                       image={part.image}

@@ -313,7 +313,7 @@ export default function MyListParts(){
     return (
         <>
           <ScrollView style={{ flex: 1 }}>
-            {loading ? (
+            {loading || !myList ? (
               <ActivityIndicator size="large" color="#A1E8C5" style={styles.loader} />
             ) : (
               <View style={styles.listContainer}>

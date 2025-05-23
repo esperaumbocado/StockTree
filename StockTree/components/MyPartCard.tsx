@@ -105,7 +105,7 @@ const MyPartCard = ({
               <TouchableOpacity
                 style={[styles.modalButton, styles.submitButton]}
                 onPress={() => {
-                  handleRemoveStock(apiUrl, counter, stockLocationId, refreshData); // Assuming handleSubmit expects the counter value
+                  handleRemoveStock(apiUrl, counter, stockLocationId, refreshData, token); // Assuming handleSubmit expects the counter value
                   setModalVisible(false); // Close the modal after submitting
                 }}
               >
