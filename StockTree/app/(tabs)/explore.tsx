@@ -38,8 +38,8 @@ export default function TabTwoScreen() {
     try {
       setModalVisible(false);
       // Navigate to partDetail/[id] with the scanned number
-      console.log('QR Code scanned:', data);
-      router.push(`/locationDetails/?${data}`);
+      console.log('QR Code scanned:   ', `/locationDetails/${data}`);
+      router.push(`/locationDetails/${data}`);
     } catch (error) {
       console.error('Error processing QR code:', error);
       alert('Failed to process QR code. Please try again.');
