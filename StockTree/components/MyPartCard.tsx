@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   button: {
-    backgroundColor: '#00a481', // A cooler and lighter blue shade
+    backgroundColor: '#00a481', // A cooler and lighter green shade
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

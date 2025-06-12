@@ -125,7 +125,7 @@ export default function Locations() {
   );
 
   return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ScrollView
 
       >

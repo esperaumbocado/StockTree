@@ -101,7 +101,7 @@ export default function MyListsScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colorScheme === 'dark' ? '#222' : 'white' }]}>
+          <View style={[styles.modalContent, { backgroundColor: colorScheme === 'dark' ? '#ddd' : 'white' }]}>
             <Text style={styles.modalTitle}>New List</Text>
             <TextInput
               style={styles.input}
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 30,
-    backgroundColor: '#1D9BF0',
+    backgroundColor: '#00a481',
     borderRadius: 28,
     width: 56,
     height: 56,
@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 12,
+    color: 'black',
   },
   input: {
     borderWidth: 1,
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   modalButton: {
-    backgroundColor: '#1D9BF0',
+    backgroundColor: '#00a481',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,

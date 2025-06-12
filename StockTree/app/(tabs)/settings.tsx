@@ -98,8 +98,8 @@ export default function SettingsScreen() {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0,
-      }}
+
+      }} edges={['top']}
     >
     <ScrollView>
         <View style={styles.container}>

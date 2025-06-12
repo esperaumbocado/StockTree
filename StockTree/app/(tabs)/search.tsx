@@ -115,9 +115,9 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
     <ParallaxScrollView
-      headerBackgroundColor='#A1E8C5'
+      headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
       headerImage={
         <View style={styles.logoContainer}>
           <Image
@@ -133,7 +133,7 @@ const SearchPage: React.FC = () => {
 
       <View style={styles.searchContainer}>
         <TextInput
-          style={[styles.searchBar, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}
+          style={[styles.searchBar, { color: 'black' }]}
           placeholder="Search for parts..."
           value={searchQuery}
           onChangeText={handleSearch}
@@ -150,16 +150,36 @@ const SearchPage: React.FC = () => {
         <ActivityIndicator size="large" color="#000" style={styles.loader} />
       ) : (
         <ScrollView style={styles.cardContainer}>
-          {results.map(({ id, name, stock, image }) => (
-            <PartCard key={id} name={name} stock={stock} image={image} partId={id} apiUrl={apiUrl} token={token} />
-          ))}
-          {hasMore && !loading && (
-            <TouchableOpacity onPress={() => fetchSearchResults(false)} style={styles.loadMoreButton}>
-              <ThemedText style={styles.loadMoreText}>Load More</ThemedText>
-            </TouchableOpacity>
+          {results.length === 0 && !loading ? (
+            <ThemedText style={styles.noResultsText}>No matches found!</ThemedText>
+          ) : (
+            <>
+              {results.map(({ id, name, stock, image }) => (
+                <PartCard
+                  key={id}
+                  name={name}
+                  stock={stock}
+                  image={image}
+                  partId={id}
+                  apiUrl={apiUrl}
+                  token={token}
+                />
+              ))}
+              {hasMore && !loading && (
+                <TouchableOpacity
+                  onPress={() => fetchSearchResults(false)}
+                  style={styles.loadMoreButton}
+                >
+                  <ThemedText style={styles.loadMoreText}>Load More</ThemedText>
+                </TouchableOpacity>
+              )}
+            </>
           )}
-          {loading && <ActivityIndicator size="small" color="#666" style={styles.loader} />}
+          {loading && (
+            <ActivityIndicator size="small" color="#666" style={styles.loader} />
+          )}
         </ScrollView>
+
       )}
     </ParallaxScrollView>
     </SafeAreaView>
@@ -197,16 +217,24 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 16,
     paddingHorizontal: 16,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#ccc',
+    borderRadius: 12,
+    //paddingHorizontal: 16,
   },
   searchBar: {
     flex: 1,
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    height: 48,
+    //borderWidth: 1.5,
+    //borderColor: '#fff',
+    //borderRadius: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#fff',
+
   },
   searchButton: {
     marginLeft: 10,
@@ -225,6 +253,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1D3D47',
   },
+  noResultsText: {
+    textAlign: 'center',
+    marginTop: 40,
+    fontSize: 16,
+    color: '#666',
+  },
+
 });
 
 export default SearchPage;

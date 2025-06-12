@@ -48,11 +48,8 @@ export default function TabTwoScreen() {
       alert('Failed to process QR code. Please try again.');
     }
   }
-
-
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ParallaxScrollView
         headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
         headerImage={
@@ -100,7 +97,7 @@ export default function TabTwoScreen() {
             <Button buttonText="Cancel" onPress={() => setModalVisible(false)} />
           </View>
         </Modal>
-        
+
         {!permission?.granted &&(
           <ThemedView style={{ padding: 16, alignItems: 'center' }}>
             <ThemedText type="default" style={{ fontSize: 16, marginTop: 5 }}>
@@ -110,7 +107,7 @@ export default function TabTwoScreen() {
         )}
 
       </ParallaxScrollView>
-      
+
     </SafeAreaView>
   );
 }

@@ -14,14 +14,14 @@ export default function PartDetailLayout() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={[]}>
       <Stack
         screenOptions={{
+
           headerShown: true,
+
           headerTintColor: colorScheme === "dark" ? "white" : "black",
-          headerStyle: {
-            backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "white",
-          },
+
           headerTitleStyle: { fontWeight: "bold" },
           headerBackTitleVisible: false,
         }}
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
   headerLeftContainer: {
     flexDirection: "row",
     alignItems: "center",
+    padding: 0,
     marginLeft: -10,
     marginRight: 10,
   },
