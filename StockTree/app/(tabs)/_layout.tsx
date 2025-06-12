@@ -83,6 +83,13 @@ export default function TabLayout() {
       }}
     />
     <Tabs.Screen
+          name="locationDetails"
+          options={{
+            title: 'Location Detail',
+            href: null,
+          }}
+        />
+    <Tabs.Screen
       name="partDetail"
       options={{
         title: 'Part Detail',
