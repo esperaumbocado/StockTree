@@ -117,7 +117,7 @@ const SearchPage: React.FC = () => {
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
     <ParallaxScrollView
-      headerBackgroundColor='#A1E8C5'
+      headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
       headerImage={
         <View style={styles.logoContainer}>
           <Image
