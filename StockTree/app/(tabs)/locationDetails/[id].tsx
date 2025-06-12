@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, 
 import { useLocalSearchParams } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CategoryCard from '@/components/CategoryCard';
+import LocationPageCard from '@/components/LocationPageCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { PartCard } from '@/components/PartCard'; // Import PartCard component
@@ -12,9 +12,9 @@ import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function DetailsScreen() {
-  const { id, categoryName } = useLocalSearchParams(); // Get the category ID and name from params
+  const { id, locationName } = useLocalSearchParams(); // Get the category ID and name from params
   const colorScheme = useColorScheme();
-  const [subcategories, setSubcategories] = useState([]);
+  const [sublocations, setSublocations] = useState([]);
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState('');
@@ -57,7 +57,7 @@ export default function DetailsScreen() {
       setLoading(true);
       const currentOffset = offset;
       const params = new URLSearchParams({
-        category: id,
+        location: id,
         limit: limit.toString(),
         offset: offset.toString(),
       });
@@ -142,7 +142,7 @@ export default function DetailsScreen() {
 
 
   // Fetch subcategories of the current category
-  const fetchSubcategories = async () => {
+  const fetchSublocations = async () => {
     if( !apiUrl || !token){ return;}
     try {
       setLoading(true);
@@ -158,7 +158,7 @@ export default function DetailsScreen() {
 
       console.log('Request Params:', params.toString());
 
-      const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;
+      const apiEndpoint = `${apiUrl}/api/stock/location/?${params.toString()}`;
 
 
       const response = await fetch(apiEndpoint, {
@@ -187,32 +187,32 @@ export default function DetailsScreen() {
       console.log('Parsed Data:', data); // Log the parsed data
 
       // Handle both array and object responses
-      let fetchedSubcategories;
+      let fetchedSublocations;
       if (Array.isArray(data)) {
         // If the response is an array, map it directly
-        fetchedSubcategories = data.map((item) => ({
+        fetchedSublocations = data.map((item) => ({
           id: item.pk,
           name: item.name,
           description: item.description,
-          partCount: item.part_count,
-          icon: item.icon,
+          items: item.items,
+          subLocations: item.sublocations,
         }));
       } else {
         // If the response is a single object, wrap it in an array
-        fetchedSubcategories = [
+        fetchedSublocations = [
           {
             id: data.pk,
             name: data.name,
             description: data.description,
-            partCount: data.part_count,
-            icon: data.icon,
+            items: data.items,
+            subLocations: data.sublocations,
           },
         ];
       }
 
-      setSubcategories(fetchedSubcategories); // Set the fetched subcategories
+      setSublocations(fetchedSublocations); // Set the fetched subcategories
     } catch (error) {
-      console.error('Error fetching subcategories:', error.message);
+      console.error('Error fetching sublocations:', error.message);
     } finally {
       setLoading(false);
     }
@@ -228,7 +228,7 @@ export default function DetailsScreen() {
   // Fetch subcategories and parts when apiUrl or category ID changes
   useEffect(() => {
     if (apiUrl && token ) {
-      fetchSubcategories();
+      fetchSublocations();
       fetchParts();
     }
   }, [apiUrl, token, id]);
@@ -244,7 +244,7 @@ export default function DetailsScreen() {
     <ScrollView style={{ flex: 1 }}>
       <ThemedView style={[styles.headerContainer, { backgroundColor: colorScheme === 'dark' ? '#A1E8C5' : '#A1E8C5' }]}>
         <ThemedText type="title" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>
-          {categoryName}
+          {locationName}
         </ThemedText>
       </ThemedView>
 
@@ -252,23 +252,23 @@ export default function DetailsScreen() {
         <ActivityIndicator size="large" color="#A1E8C5" style={styles.loader} />
       ) : (
         <View style={styles.categoryContainer}>
-          {subcategories.length > 0 ? (
+          {sublocations.length > 0 ? (
             <View>
-              <ThemedText style={styles.subcategoryHeader}>Subcategories</ThemedText>
-              {subcategories.map(({ id, name, description, partCount, icon }) => (
-                <CategoryCard
+              <ThemedText style={styles.subcategoryHeader}>Sublocations</ThemedText>
+              {sublocations.map(({ id, name, description, items, subLocations }) => (
+                <LocationPageCard
                   key={id}
                   name={name}
                   description={description}
-                  partCount={partCount}
-                  icon={icon}
-                  categoryId={id} // Pass the subcategory ID to the card
+                  items={items}
+                  subLocations={subLocations}
+                  locationId={id} // Pass the sublocation ID to the card
 
                 />
               ))}
             </View>
           ) : (
-            <ThemedText style={styles.noResults}>No subcategories found.</ThemedText>
+            <ThemedText style={styles.noResults}>No sublocations found.</ThemedText>
           )}
 
           {parts.length > 0 ? (

@@ -117,12 +117,12 @@ import * as SecureStore from 'expo-secure-store';
 
 
   // Update the stock of the stockItem
-  export const handleRemoveStock = async (apiUrl: string, counter: number, stockItemId: integer, refreshData: ()=> void) => {
+  export const handleRemoveStock = async (apiUrl: string, counter: number, stockItemId: integer, refreshData: ()=> void, token) => {
     try {
       const response = await fetch(`${apiUrl}/api/stock/remove/`, {
         method: 'POST',
         headers: {
-          'Authorization': 'Token inv-8424bedbeceb27da942439fff71390388e87f3fe-20250321',
+          'Authorization': `Token ${token}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
