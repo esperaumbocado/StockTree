@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, useColorScheme } from 'react-native';
 import { addPart, handleRemoveStock } from '@/utils/utils';
 
 const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const colorScheme = useColorScheme();
   const [counter, setCounter] = useState(0);
   const [isWledOn, setIsWledOn] = useState(false);
   const WLED_IP = "http://192.168.1.100"; // Replace with actual WLED IP
@@ -30,9 +31,9 @@ const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
   };
 
   return (
-    <View style={styles.cardContainer}>
+    <View style={colorScheme === 'dark' ? styles.cardContainerDark : styles.cardContainerLight }>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>{stockItem.location_name}</Text>
+        <Text style = {colorScheme === 'dark' ? styles.titleDark : styles.titleLight}>{stockItem.location_name}</Text>
       </View>
     {/*
       <View style={styles.detailContainer}>
@@ -41,18 +42,18 @@ const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
       </View>
 */}
       <View style={styles.detailContainer}>
-        <Text style={styles.label}>Quantity:</Text>
-        <Text style={styles.value}>{stockItem.quantity}</Text>
+        <Text style={colorScheme === 'dark' ? styles.labelDark : styles.labelLight}>Quantity:</Text>
+        <Text  style={colorScheme === 'dark' ? styles.valueDark : styles.valueLight} >{stockItem.quantity}</Text>
       </View>
 
       <View style={styles.detailContainer}>
-        <Text style={styles.label}>Serial Number:</Text>
-        <Text style={styles.value}>{stockItem.serial}</Text>
+        <Text style = {colorScheme === 'dark' ? styles.labelDark : styles.labelLight}>Serial Number:</Text>
+        <Text style={colorScheme === 'dark' ? styles.valueDark : styles.valueLight} >{stockItem.serial}</Text>
       </View>
 
       <View style={styles.detailContainer}>
-        <Text style={styles.label}>Batch:</Text>
-        <Text style={styles.value}>{stockItem.batch}</Text>
+        <Text style = {colorScheme === 'dark' ? styles.labelDark : styles.labelLight} >Batch:</Text>
+        <Text style={colorScheme === 'dark' ? styles.valueDark : styles.valueLight} >{stockItem.batch}</Text>
       </View>
 {/*
       <View style={styles.detailContainer}>
@@ -138,7 +139,18 @@ const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
+  cardContainerDark: {
+    backgroundColor: '#333', // White background for the card
+    padding: 15,
+    borderRadius: 10,
+    margin: 10,
+    shadowColor: '#4a4a4a', // Slightly darker shadow for a subtle effect
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, // Reduced opacity for a softer shadow
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardContainerLight: {
     backgroundColor: '#ffffff', // White background for the card
     padding: 15,
     borderRadius: 10,
@@ -153,27 +165,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  title: {
+  titleDark: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1D3557', // A muted, refined blue that is not too bright
+    color: '#ccc', // white for dark mode
+  },
+  titleLight: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1D3557', // a nice blue for light mode
   },
   detailContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 5,
   },
-  label: {
+  labelLight: {
     fontSize: 14,
     color: '#6D6D6D', // Softer gray for labels
   },
-  value: {
+  labelDark: {
+    fontSize: 14,
+    color: '#ccc', // Softer gray for labels
+  },
+  valueLight: {
     fontSize: 14,
     color: '#1D3557', // Consistent muted blue for values
     fontWeight: 'bold',
   },
+  valueDark: {
+    fontSize: 14,
+    color: '#ccc', // Consistent muted blue for values
+    fontWeight: 'bold',
+  },
   button: {
-    backgroundColor: '#457B9D', // A cooler and lighter blue shade
+    backgroundColor: '#00a481', // A cooler and lighter blue shade
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

@@ -14,7 +14,7 @@ export default function LocationDetailLayout() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={[]}>
       <Stack
         screenOptions={{
           headerShown: true,
