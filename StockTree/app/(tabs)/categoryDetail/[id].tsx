@@ -242,7 +242,7 @@ export default function DetailsScreen() {
 
   return (
     <ScrollView style={{ flex: 1 }}>
-      <ThemedView style={[styles.headerContainer, { backgroundColor: colorScheme === 'dark' ? '#A1E8C5' : '#A1E8C5' }]}>
+      <ThemedView style={[styles.headerContainer, { backgroundColor: colorScheme === 'dark' ? '#1D473D' : '#A1E8C5' }]}>
         <ThemedText type="title" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>
           {categoryName}
         </ThemedText>

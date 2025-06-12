@@ -24,8 +24,11 @@ export default function TabLayout() {
           ios: {
             // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
+            height: 60
           },
-          default: {},
+          default: {
+            height: 60
+          },
         }),
     }}>
 
@@ -79,6 +82,13 @@ export default function TabLayout() {
         href: null,
       }}
     />
+    <Tabs.Screen
+          name="locationDetails"
+          options={{
+            title: 'Location Detail',
+            href: null,
+          }}
+        />
     <Tabs.Screen
       name="partDetail"
       options={{

@@ -11,7 +11,7 @@ const MAPPING = {
   // See SF Symbols in the SF Symbols app on Mac.
   'house.fill': 'home',
   'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
+  'qrcode': 'qr-code',
   'chevron.right': 'chevron-right',
   'gearshape.fill' : 'settings',
 } as Partial<

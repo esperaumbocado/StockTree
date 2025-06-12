@@ -19,12 +19,9 @@ export default function PartDetailLayout() {
         screenOptions={{
 
           headerShown: true,
-          headerStatusBarHeight: 2,
-          headerTintColor: colorScheme === "dark" ? "white" : "black",
-          headerStyle: {
 
-            backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "white",
-          },
+          headerTintColor: colorScheme === "dark" ? "white" : "black",
+
           headerTitleStyle: { fontWeight: "bold" },
           headerBackTitleVisible: false,
         }}
@@ -56,7 +53,6 @@ export default function PartDetailLayout() {
 
 const styles = StyleSheet.create({
   headerLeftContainer: {
-    backgroundColor: "#f0f",
     flexDirection: "row",
     alignItems: "center",
     padding: 0,

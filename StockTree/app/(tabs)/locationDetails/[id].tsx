@@ -22,7 +22,7 @@ export default function DetailsScreen() {
   const [offset, setOffset] = useState(0);
   const [limit] = useState(10);
   const [hasMore, setHasMore] = useState(false);
-
+  var ind = 0;
   const defToken = async () => {
     const storedToken = await loadToken();
     if( storedToken){
@@ -64,7 +64,7 @@ export default function DetailsScreen() {
 
       console.log('Request Params (Parts): ', params.toString());
 
-      const apiEndpoint = `${apiUrl}/api/part/?${params.toString()}`;
+      const apiEndpoint = `${apiUrl}/api/stock/?${params.toString()}`;
       console.log('API ENDPOINT (Parts): ', apiEndpoint);
       const response = await fetch(apiEndpoint, {
         method: 'GET',
@@ -92,41 +92,45 @@ export default function DetailsScreen() {
       console.log("Parsed Data (Parts): ", data);
 
       let fetchedParts;
-      fetchedParts = data.results.map((item) => {
-        const imageUrl = item.image ? `${apiUrl}${item.image}` : null;
-         return {
-          id: item.pk,
-          name: item.name,
-          description: item.description,
-          image: imageUrl,
-           stock: item.in_stock,
-        };
-      });
-/*
-      if (!Array.isArray(data)) {
-        fetchedParts = data.results.map((item) => {
-          const imageUrl = item.image ? `${apiUrl}${item.image}` : null;
-          return {
-            id: item.pk,
-            name: item.name,
-            description: item.description,
-            image: imageUrl,
-            stock: item.in_stock,
-          };
-        });
-      } else {
-        const imageUrl = data.image ? `${apiUrl}${data.image}` : null;
-        fetchedParts = [
-          {
-            id: data.pk,
-            name: data.name,
-            description: data.description,
-            image: imageUrl,
-            stock: data.in_stock,
-          },
-        ];
-      }
-*/
+      fetchedParts = await Promise.all(data.results.map(async (item) => {
+          const partId = item.part;
+          const stock = item.quantity;
+
+          try {
+              const partResponse = await fetch(`${apiUrl}/api/part/${partId}/`, {
+                method: 'GET',
+                headers: {
+                  Authorization: `Token ${token}`,
+                  Accept: 'application/json',
+                  Connection: 'keep-alive',
+                  Host: 'inventree.localhost',
+                },
+              });
+
+              if (!partResponse.ok) {
+                throw new Error(`Error searching part ${partId}: ${partResponse.status}`);
+              }
+
+              const partData = await partResponse.json();
+              const imageUrl = partData.image ? `${apiUrl}${partData.image}` : null;
+
+              return {
+                id: partId,
+                name: partData.name,
+                image: imageUrl,
+                stock: stock,
+              };
+
+            } catch (err) {
+              console.error(`Erro ao processar parte ${partId}:`, err);
+              return {
+                id: partId,
+                name: 'Error searching name',
+                image: null,
+                stock: stock,
+              };
+      }}));
+      console.log(fetchedParts);
       setParts(prev =>  [...prev, ...fetchedParts]);
       setOffset(currentOffset + limit);
       setHasMore(Boolean(data.next));
@@ -242,7 +246,7 @@ export default function DetailsScreen() {
 
   return (
     <ScrollView style={{ flex: 1 }}>
-      <ThemedView style={[styles.headerContainer, { backgroundColor: colorScheme === 'dark' ? '#A1E8C5' : '#A1E8C5' }]}>
+      <ThemedView style={[styles.headerContainer, { backgroundColor: colorScheme === 'dark' ? '#1D473D' : '#A1E8C5' }]}>
         <ThemedText type="title" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>
           {locationName}
         </ThemedText>
@@ -279,7 +283,7 @@ export default function DetailsScreen() {
 
                   return (
                     <PartCard
-                      key={part.id}
+                      key={ind++}
                       name={part.name}
                       stock={part.stock}
                       image={part.image}

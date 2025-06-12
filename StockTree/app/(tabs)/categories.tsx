@@ -131,7 +131,6 @@ export default function Categories() {
       >
         <ParallaxScrollView
           headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
-          contentBackgroundColor="white"
           headerImage={
             <View style={styles.logoContainer}>
               <Image
