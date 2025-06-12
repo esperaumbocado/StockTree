@@ -36,17 +36,10 @@ export default function TabTwoScreen() {
 
   function qrCodeRead(data: string) {
     try {
-      // Validate that the scanned data is a number
-      const id = parseInt(data, 10);
-      if (isNaN(id)) {
-        alert('Invalid QR code: Please scan a QR code containing a number.');
-        return;
-      }
-
       setModalVisible(false);
       // Navigate to partDetail/[id] with the scanned number
-      console.log('QR Code scanned:', id);
-      router.push(`/partDetail/${id}`);
+      console.log('QR Code scanned:', data);
+      router.push(`/locationDetails/?${data}`);
     } catch (error) {
       console.error('Error processing QR code:', error);
       alert('Failed to process QR code. Please try again.');
