@@ -5,13 +5,13 @@ import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useRef } from 'react';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+//import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 
 
 export default function TabTwoScreen() {
   const [modalIsVisible, setModalVisible] = useState(false);
-  const [permission, requestPermission] = useCameraPermissions();
+  //const [permission, requestPermission] = useCameraPermissions();
 
   const qrCodeLock = useRef(false);
   const router = useRouter();
@@ -53,7 +53,7 @@ export default function TabTwoScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ParallaxScrollView
         headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
         headerImage={
@@ -67,6 +67,8 @@ export default function TabTwoScreen() {
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Explore</ThemedText>
         </ThemedView>
+
+
         <Button title="Ler QRCode" onPress={handleOpenCamera} />
         <Modal visible={modalIsVisible} style={{ flex: 1 }}>
           {permission?.granted ? (
@@ -88,6 +90,7 @@ export default function TabTwoScreen() {
             <Button title="Cancel" onPress={() => setModalVisible(false)} />
           </View>
         </Modal>
+
       </ParallaxScrollView>
     </SafeAreaView>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import { addPart, handleRemoveStock } from '@/utils/utils';
+import { handleRemoveStock } from '@/utils/utils';
 
 const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -66,17 +66,6 @@ const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
         <Text style={styles.value}>{stockItem.location_name}</Text>
       </View>
 */}
-      {/*ADD STOCKITEM TO MYLIST*/}
-      <TouchableOpacity
-        activeOpacity={0.5} // gives visual feedback on press
-        style={styles.button}
-        onPress={async () => {
-          console.log('stockItem part', stockItem.part);
-          await addPart(stockItem.part, stockItem.pk, SELECTED_PARTS_KEY);
-        }}
-      >
-        <Text style={styles.buttonText}>Add</Text>
-      </TouchableOpacity>
 
       {/*LOCATE WITH WLED BUTTON */}
       <TouchableOpacity style={styles.button} onPress={() => toggleWLED()}>
