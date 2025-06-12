@@ -1,4 +1,4 @@
-import { StyleSheet, View, Button, Modal } from 'react-native';
+import { StyleSheet, View, Modal } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useRef } from 'react';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
+import Button from '@/components/ui/Button';
 
 
 export default function TabTwoScreen() {
@@ -35,17 +36,10 @@ export default function TabTwoScreen() {
 
   function qrCodeRead(data: string) {
     try {
-      // Validate that the scanned data is a number
-      const id = parseInt(data, 10);
-      if (isNaN(id)) {
-        alert('Invalid QR code: Please scan a QR code containing a number.');
-        return;
-      }
-
       setModalVisible(false);
       // Navigate to partDetail/[id] with the scanned number
-      console.log('QR Code scanned:', id);
-      router.push(`/partDetail/${id}`);
+      console.log('QR Code scanned:   ', `/locationDetails/${data}`);
+      router.push(`/locationDetails/${data}`);
     } catch (error) {
       console.error('Error processing QR code:', error);
       alert('Failed to process QR code. Please try again.');
@@ -54,20 +48,34 @@ export default function TabTwoScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      
       <ParallaxScrollView
         headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
         headerImage={
           <IconSymbol
             size={310}
             color="#808080"
-            name="chevron.left.forwardslash.chevron.right"
+            name="qrcode"
             style={styles.headerImage}
           />
         }>
-        <ThemedView style={styles.titleContainer}>
+        <ThemedView style={{ padding: 16, alignItems: 'center' }}>
           <ThemedText type="title">Explore</ThemedText>
         </ThemedView>
-        <Button title="Ler QRCode" onPress={handleOpenCamera} />
+
+        <ThemedView>
+          <ThemedText type="default" style={{ fontSize: 20, marginBottom: 24 }}>
+            Welcome to the Explore screen. Here you can scan QR codes to navigate our app.
+          </ThemedText>
+          <ThemedText type="default" style={{ fontSize: 20, paddingBottom: 35 }}>
+            Simply press the "Scan QRCode" button and point your camera at the location QRCode.
+          </ThemedText>
+        </ThemedView>
+
+
+        <Button buttonText="Scan QRCode" onPress={handleOpenCamera}/>
+
+
         <Modal visible={modalIsVisible} style={{ flex: 1 }}>
           {permission?.granted ? (
             <CameraView
@@ -85,10 +93,20 @@ export default function TabTwoScreen() {
             </ThemedView>
           )}
           <View style={styles.footer}>
-            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+            <Button buttonText="Cancel" onPress={() => setModalVisible(false)} />
           </View>
         </Modal>
+        
+        {!permission?.granted &&(
+          <ThemedView style={{ padding: 16, alignItems: 'center' }}>
+            <ThemedText type="default" style={{ fontSize: 16, marginTop: 5 }}>
+              Camera permission not granted. Please enable it in your device settings.
+            </ThemedText>
+          </ThemedView>
+        )}
+
       </ParallaxScrollView>
+      
     </SafeAreaView>
   );
 }
@@ -100,14 +118,13 @@ const styles = StyleSheet.create({
     left: -35,
     position: 'absolute',
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
   footer: {
     position: 'absolute',
     bottom: 32,
     left: 32,
     right: 32,
+  },
+  button: {
+    backgroundColor: "#000000",
   },
 });
