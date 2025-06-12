@@ -45,7 +45,7 @@ export default function TabTwoScreen() {
       alert('Failed to process QR code. Please try again.');
     }
   }
-
+   
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ParallaxScrollView
