@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, useColorScheme } from 'react-native';
 import { addPart, handleRemoveStock } from '@/utils/utils';
 
-const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
+const StockItemCard = ({ stockItem, apiUrl, refreshData, token }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const colorScheme = useColorScheme();
   const [counter, setCounter] = useState(0);
@@ -107,7 +107,7 @@ const StockItemCard = ({ stockItem, apiUrl, refreshData }) => {
             <TouchableOpacity
               style={[styles.modalButton, styles.submitButton]}
               onPress={() => {
-                handleRemoveStock(apiUrl, counter, stockItem.pk, refreshData); // Assuming handleSubmit expects the counter value
+                handleRemoveStock(apiUrl, counter, stockItem.pk, refreshData, token); // Assuming handleSubmit expects the counter value
                 setModalVisible(false); // Close the modal after submitting
               }}
             >
@@ -227,13 +227,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalButton: {
-    backgroundColor: '#457B9D', // Matching color to the counter button
+    backgroundColor: '#666666', // Matching color to the counter button
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
   submitButton: {
-    backgroundColor: '#1D3557', // Deep blue for the submit button
+    backgroundColor: '#00a481', // Deep blue for the submit button
     marginTop: 10,
   },
   closeButton: {

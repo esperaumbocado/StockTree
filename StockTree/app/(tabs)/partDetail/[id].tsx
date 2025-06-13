@@ -190,7 +190,7 @@ export default function DetailsScreen() {
 
               {stockItems && stockItems.length > 0 ? (<View>
                    {stockItems.map((item) => (
-                    <StockItemCard key={item.pk} stockItem={item} apiUrl={apiUrl} refreshData={refreshData} />
+                    <StockItemCard key={item.pk} stockItem={item} apiUrl={apiUrl} refreshData={refreshData} token={token} />
                   ))}
               </View>
               ) : (
