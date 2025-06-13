@@ -37,15 +37,17 @@ export default function TabTwoScreen() {
   function qrCodeRead(data: string) {
     try {
       setModalVisible(false);
-      // Navigate to partDetail/[id] with the scanned number
-      console.log('QR Code scanned:   ', `/locationDetails/${data}`);
-      router.push(`/locationDetails/${data}`);
+
+      const [id, name] = data.split(';');
+      if (!id || !name) throw new Error('Invalid QR code format');
+
+      const encodedName = encodeURIComponent(name.trim());
+      router.push(`/locationDetails/${id}?locationName=${encodedName}`);
     } catch (error) {
       console.error('Error processing QR code:', error);
       alert('Failed to process QR code. Please try again.');
     }
   }
-   
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <ParallaxScrollView
