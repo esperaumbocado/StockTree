@@ -10,7 +10,7 @@ export default function PartDetailLayout() {
 
   const handleBackPress = () => {
     console.log("Back button pressed");
-    router.replace("/myLists");
+    router.back();//router.push("/myLists");
   };
 
   return (
@@ -27,13 +27,13 @@ export default function PartDetailLayout() {
         }}
       >
         <Stack.Screen
-          name="[id]"
+          name="page"
           options={{
             title: "List Details",
             headerLeft: () => (
               <View style={styles.headerLeftContainer}>
                 <TouchableOpacity
-                  onPressIn={handleBackPress}
+                  onPress={handleBackPress}
                   style={styles.backButton}
                 >
                   <Ionicons

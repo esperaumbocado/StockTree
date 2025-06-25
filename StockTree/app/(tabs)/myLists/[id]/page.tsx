@@ -21,7 +21,7 @@ export default function MyListParts(){
     const [selectedParts, setSelectedParts] = useState(new Set());
     const MY_LISTS_KEY = 'MY_LISTS';
     const colorScheme = useColorScheme();
-
+    console.log("current listId: ", listId);
     // Fetch the list based on ID
     const getListById = async (listId) => {
 

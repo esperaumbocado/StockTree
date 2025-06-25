@@ -42,7 +42,7 @@ export default function TabTwoScreen() {
       if (!id || !name) throw new Error('Invalid QR code format');
 
       const encodedName = encodeURIComponent(name.trim());
-      router.push(`/locationDetails/${id}?locationName=${encodedName}`);
+      router.push(`/locations/${id}?locationName=${encodedName}/page`);
     } catch (error) {
       console.error('Error processing QR code:', error);
       alert('Failed to process QR code. Please try again.');

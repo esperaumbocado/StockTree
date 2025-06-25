@@ -60,9 +60,8 @@ export default function MyListsScreen() {
   const handlePress = (listId) => {
     console.log("listId");
     console.log(listId);
-    router.replace({
-      pathname: `/myListDetails/${listId}`,  // Ensure it's a string
-    });
+    router.push(`/myLists/${listId}/page`  // Ensure it's a string
+    );
 
 
   };

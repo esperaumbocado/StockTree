@@ -10,7 +10,7 @@ export default function LocationDetailLayout() {
 
   const handleBackPress = () => {
     console.log("Back button pressed");
-    router.replace('/');
+    router.back();
   };
 
   return (
@@ -27,7 +27,7 @@ export default function LocationDetailLayout() {
         }}
       >
         <Stack.Screen
-          name="[id]"
+          name="page"
           options={{
             title: "Location Detail",
             headerLeft: () => (

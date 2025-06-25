@@ -10,9 +10,9 @@ export default function MyListsLayout() {
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={[]}>
-      <Stack
+      <Stack initialRouteName="index"
         screenOptions={{
-          headerShown: true,
+          headerShown: false,
           headerTintColor: colorScheme === 'dark' ? 'white' : 'black',
           headerStyle: {
             backgroundColor: colorScheme === 'dark' ? '#1E1E1E' : 'white',
@@ -27,6 +27,7 @@ export default function MyListsLayout() {
           name="index"
           options={{
             title: 'My Lists',
+            headerShown: true,
             headerLeft: () => (
               <View style={styles.headerLeftContainer}>
                 <Ionicons

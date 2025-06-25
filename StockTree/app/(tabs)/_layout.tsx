@@ -84,13 +84,7 @@ export default function TabLayout() {
         href: null,
       }}
     />
-    <Tabs.Screen
-          name="locationDetails"
-          options={{
-            title: 'Location Detail',
-            href: null,
-          }}
-        />
+
     <Tabs.Screen
       name="partDetail"
       options={{
@@ -98,12 +92,7 @@ export default function TabLayout() {
         href: null,
       }}
     />
-    <Tabs.Screen
-      name="myListDetails"
-      options={{
-        href: null, // hides it from the tab bar
-      }}
-    />
+
 
     <Tabs.Screen
       name="index"
