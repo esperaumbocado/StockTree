@@ -108,7 +108,7 @@ import * as SecureStore from 'expo-secure-store';
       lists[targetListIndex] = targetList;
       await AsyncStorage.setItem(MY_LISTS_KEY, JSON.stringify(lists));
 
-      Alert.alert("Success", "Part added to the list.");
+      Alert.alert("Part Added", "This part has been added to your selected list.");
     } catch (err) {
       console.error("Add to list failed:", err);
       Alert.alert("Error", "Could not add part to the list.");

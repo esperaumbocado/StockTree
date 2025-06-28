@@ -6,14 +6,15 @@ import ImageCard from './ImageCard';
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchStockItemsForPart, getMyLists, addPartToList } from '@/utils/utils';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const PartCard = ({name, stock, image, partId, apiUrl, token, from}) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const [showLocationModal, setShowLocationModal] = useState(false);
   const [showAddConfigModal, setShowAddConfigModal] = useState(false);
   const [locationOptions, setLocationOptions] = useState([]);
-  //const [listOptions, setListOptions] = useState([]);
+  const [openListPicker, setOpenListPicker] = useState(false);
+  const [openLocationPicker, setOpenLocationPicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedListId, setSelectedListId] = useState("");
   const [lists, setLists] = useState([]);
@@ -75,12 +76,15 @@ const PartCard = ({name, stock, image, partId, apiUrl, token, from}) => {
               },
             ]}
           >
-            <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>
-              {name}
-            </Text>
-            <Text style={[styles.details, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>
-              In stock: {stock}
-            </Text>
+            <View style={styles.cardInfo}>
+
+                <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>
+                  {name}
+                </Text>
+                <Text style={[styles.details, { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>
+                  In stock: {stock}
+                </Text>
+            </View>
             <ImageCard imageLink={image} token={token} />
 
             {/* Add button lives *inside* card but isn't wrapped by outer pressable */}
@@ -101,40 +105,6 @@ const PartCard = ({name, stock, image, partId, apiUrl, token, from}) => {
         )}
 
     </View>
-    {/* Modal for choosing stock location */}
-    <Modal
-      visible={showLocationModal}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setShowLocationModal(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Select a Location</Text>
-          <FlatList
-            data={locationOptions}
-            keyExtractor={(item) => item.pk.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.modalItem}
-                onPress={async () => {
-                  await addPart(partId, item.pk, SELECTED_PARTS_KEY);
-                  setShowLocationModal(false);
-                }}
-              >
-                <Text style={styles.modalItemText}>{item.location_name}</Text>
-              </TouchableOpacity>
-            )}
-          />
-          <TouchableOpacity
-            style={styles.modalCancelButton}
-            onPress={() => setShowLocationModal(false)}
-          >
-            <Text style={styles.modalCancelText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
 
     {/* Modal for choosing stock location and list */}
     <Modal
@@ -145,37 +115,55 @@ const PartCard = ({name, stock, image, partId, apiUrl, token, from}) => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Select a Location</Text>
-
           {/* Location Picker */}
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={selectedLocation?.pk?.toString() || ""}
-              onValueChange={(itemValue) => {
-                const location = locationOptions.find(loc => loc.pk.toString() === itemValue);
-                setSelectedLocation(location || null);
-              }}
-            >
-              <Picker.Item label="Choose a location..." value="" enabled={false} />
-              {locationOptions.map((loc) => (
-                <Picker.Item key={loc.pk} label={loc.location_name} value={loc.pk.toString()} />
-              ))}
-            </Picker>
-          </View>
+          <Text style={styles.modalTitle}>Select a Location</Text>
+                <DropDownPicker
+                  open={openLocationPicker}
+                  value={selectedLocation?.pk?.toString() || null}
+                  items={locationOptions.map(loc => ({
+                    label: loc.location_name,
+                    value: loc.pk.toString()
+                  }))}
+                  setOpen={setOpenLocationPicker}
+                  setValue={(val) => {
+                    const locObj = locationOptions.find(l => l.pk.toString() === val());
+                    setSelectedLocation(locObj || null);
+                  }}
+                  placeholder="Choose a location..."
+                  style={{
+                    borderColor: '#ccc',
+                    borderRadius: 6,
+                    marginBottom: 16,
+                  }}
+                  dropDownContainerStyle={{
+                    borderColor: '#ccc',
+                  }}
+                  zIndex={3000}
+                  zIndexInverse={1000}
+                />
 
-          {/* List Picker */}
+          {/* List Picker (Dropdown) */}
           <Text style={styles.modalTitle}>Select a List</Text>
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={selectedListId?.toString() || ""}
-              onValueChange={(itemValue) => setSelectedListId(itemValue)}
-            >
-              <Picker.Item label="Choose a list..." value="" enabled={false} />
-              {lists.map((list) => (
-                <Picker.Item label={list.name} value={list.id.toString()} key={list.id} />
-              ))}
-            </Picker>
-          </View>
+          <DropDownPicker
+            open={openListPicker}
+            value={selectedListId}
+            items={lists.map((list) => ({ label: list.name, value: list.id.toString() }))}
+            setOpen={setOpenListPicker}
+            setValue={setSelectedListId}
+            setItems={() => {}} // No need to modify items dynamically
+            placeholder="Choose a list..."
+            style={{
+              borderColor: '#ccc',
+              borderRadius: 6,
+              marginBottom: 16,
+            }}
+            dropDownContainerStyle={{
+              borderColor: '#ccc',
+            }}
+            zIndex={1000}
+            zIndexInverse={3000}
+          />
+
 
           {/* Confirm / Cancel Buttons */}
           <View style={styles.modalButtons}>
@@ -225,6 +213,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
   },
+  cardInfo: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'flex-start', // allows multi-line alignment at top
+    justifyContent: 'flex-start',
+    paddingBottom: 12,
+    flexWrap: 'wrap',         // allow items to wrap to new lines
+    gap: 8,
+    maxWidth: '90%',
+  },
+
+
   title: {
     fontSize: 18,
     fontWeight: "bold",
@@ -289,29 +289,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   modalCancelButton: {
-    marginTop: 10,
+
     alignItems: 'center',
+    backgroundColor: '#8B0000',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+
   },
   modalCancelText: {
-    color: 'red',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
   },
 
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
   },
   modalConfirmButton: {
-    backgroundColor: '#1D3557',
+    backgroundColor: '#00a481',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 6,

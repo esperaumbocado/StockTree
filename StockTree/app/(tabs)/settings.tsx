@@ -28,7 +28,7 @@ export default function SettingsScreen() {
   const saveApiUrl = async () => {
     try {
       await saveApiUrlToStorage('API_URL', apiUrl);
-      Alert.alert('Success', 'API URL saved!');
+      Alert.alert('Settings Updated', 'The API URL has been saved.');
     } catch (error) {
       Alert.alert('Error', 'Failed to save API URL.');
     }
@@ -62,7 +62,7 @@ export default function SettingsScreen() {
     try {
       console.log('Current token: ', adminToken);
       await saveTokenToStorage('TOKEN', adminToken);
-      Alert.alert('Success', 'Token saved!');
+      Alert.alert('Settings updated', 'Your access token has been stored.');
     } catch (error) {
       Alert.alert('Error', 'Failed to save Token.');
     }

@@ -86,40 +86,45 @@ const StockItemCard = ({ stockItem, apiUrl, refreshData, token }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.counterText}>Amount to take: {counter}</Text>
-            <Text style={styles.infoText}>Stock: {stockItem.quantity}</Text>
+            <View style = {styles.stockCardInfo}>
+                <Text style={styles.counterText}>Amount to take: {counter}</Text>
+                <Text style={styles.infoText}>Stock: {stockItem.quantity}</Text>
+            </View>
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                style={styles.modalButton}
+                style={[styles.modalButton, { backgroundColor: '#333333' }]}
                 onPress={() => setCounter(counter >= stockItem.quantity ? stockItem.quantity : counter + 1)}
               >
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.modalButton}
+                style={[styles.modalButton, { backgroundColor: '#333333' }]}
                 onPress={() => setCounter(counter > 0 ? counter - 1 : 0)}
               >
                 <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              style={[styles.modalButton, styles.submitButton]}
-              onPress={() => {
-                handleRemoveStock(apiUrl, counter, stockItem.pk, refreshData, token); // Assuming handleSubmit expects the counter value
-                setModalVisible(false); // Close the modal after submitting
-              }}
-            >
-              <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={[styles.submitButton]}
+                  onPress={() => {
+                    handleRemoveStock(apiUrl, counter, stockItem.pk, refreshData, token); // Assuming handleSubmit expects the counter value
+                    setModalVisible(false); // Close the modal after submitting
+                  }}
+                >
+                  <Text style={styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.modalButton, styles.closeButton]}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.closeButton]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonText}>Close</Text>
+                </TouchableOpacity>
+            </View>
+
           </View>
         </View>
       </Modal>
@@ -212,9 +217,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff', // White background for the modal
     borderRadius: 10,
   },
+  stockCardInfo: {
+    alignSelf: 'center',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',         // allow items to wrap to new lines
+    gap: 2,
+    maxWidth: '90%',
+
+  },
   counterText: {
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 10,
+
   },
   infoText: {
     fontSize: 16,
@@ -227,18 +243,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalButton: {
-    backgroundColor: '#666666', // Matching color to the counter button
+    backgroundColor: '#ccc', // Matching color to the counter button
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    //paddingHorizontal: 20,
     borderRadius: 5,
+    width: '48%',
   },
   submitButton: {
     backgroundColor: '#00a481', // Deep blue for the submit button
     marginTop: 10,
+    paddingVertical: 10,
+    borderRadius: 5,
+    width: '48%',
   },
   closeButton: {
     backgroundColor: '#D32F2F', // A subtle red for the close button
     marginTop: 10,
+    paddingVertical: 10,
+    borderRadius: 5,
+    width: '48%',
   },
   buttonText: {
     color: '#ffffff', // White text for button text

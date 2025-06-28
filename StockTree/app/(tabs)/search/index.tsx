@@ -116,6 +116,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+    <ScrollView>
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}
       headerImage={
@@ -130,7 +131,7 @@ const SearchPage: React.FC = () => {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>Search</ThemedText>
       </ThemedView>
-
+    </ParallaxScrollView>
       <View style={styles.searchContainer}>
         <TextInput
           style={[styles.searchBar, { color: 'black' }]}
@@ -182,7 +183,7 @@ const SearchPage: React.FC = () => {
         </ScrollView>
 
       )}
-    </ParallaxScrollView>
+    </ScrollView>
     </SafeAreaView>
   );
 }
@@ -218,14 +219,15 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    marginVertical: 16,
+    paddingHorizontal: 12,
     justifyContent: 'center',
     backgroundColor: '#fff',
     borderWidth: 1.5,
     borderColor: '#ccc',
     borderRadius: 12,
-    //paddingHorizontal: 16,
+    alignSelf: 'center',
+    width: '90%',
   },
   searchBar: {
     flex: 1,
