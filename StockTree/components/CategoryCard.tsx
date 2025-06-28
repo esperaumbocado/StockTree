@@ -9,7 +9,7 @@ const CategoryCard = ({ name, description, partCount, icon, categoryId }) => {
     <View style={styles.cardContainer}>
       <Link
         href={{
-          pathname: `/categoryDetail/${categoryId}`,
+          pathname: `/categories/${categoryId}/page`,
           params: { categoryName: name }, // Pass the category name as a parameter
         }}
         asChild

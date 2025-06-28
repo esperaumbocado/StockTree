@@ -9,7 +9,7 @@ const LocationPageCard = ({ name, description, items, subLocations, locationId }
     <View style={styles.cardContainer}>
       <Link
         href={{
-          pathname: `/locationDetails/${locationId}`,
+          pathname: `/locations/${locationId}/page`,
           params: { locationName: name }, // Pass the category name as a parameter
         }}
         asChild

@@ -7,7 +7,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchStockItemsForPart, getMyLists, addPartToList } from '@/utils/utils';
 
-const PartCard = ({name, stock, image, partId, apiUrl, token}) => {
+const PartCard = ({name, stock, image, partId, apiUrl, token, from}) => {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -55,8 +55,8 @@ const PartCard = ({name, stock, image, partId, apiUrl, token}) => {
   // GO TO DETAILS PAGE
   const navigateToDetails = () => {
     router.push({
-      pathname: `/partDetail/${partId}`,
-      params: { partName: name },
+      pathname: `/(tabs)/${from}/partDetail/${partId}`,
+      params: { partName: name},
     });
   };
 
