@@ -286,6 +286,7 @@ export default function DetailsScreen() {
                       partId={part.id}
                       apiUrl={apiUrl}
                       token={token}
+                      from={'categories'}
                     />
                   );
                 })}

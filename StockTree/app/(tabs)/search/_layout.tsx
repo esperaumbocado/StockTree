@@ -1,7 +1,7 @@
 import { Stack } from 'expo-router';
 import React from 'react';
 
-export default function LocationsLayout() {
+export default function CategoriesLayout() {
 
   return (
 
@@ -15,7 +15,7 @@ export default function LocationsLayout() {
           name="index"
 
           options={{
-            title: 'Locations',
+            title: 'Search',
 
           }}
         />

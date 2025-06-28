@@ -1,17 +1,21 @@
-import { Stack, router } from "expo-router";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Platform, TouchableOpacity, View, StyleSheet, useColorScheme } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PartDetailLayout() {
+
   const colorScheme = useColorScheme();
   const backIcon = Platform.OS === "ios" ? "chevron-back" : "arrow-back-sharp";
 
+
   const handleBackPress = () => {
     console.log("Back button pressed");
-    router.push('/search');
+    router.back();
   };
+
+
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={[]}>

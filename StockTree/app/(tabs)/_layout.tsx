@@ -77,22 +77,6 @@ export default function TabLayout() {
         tabBarIcon: ({ color }) => <FontAwesome name="list" size={28} color={color} />,
       }}
     />
-    <Tabs.Screen
-      name="categoryDetail"
-      options={{
-        title: 'Category Detail',
-        href: null,
-      }}
-    />
-
-    <Tabs.Screen
-      name="partDetail"
-      options={{
-        title: 'Part Detail',
-        href: null,
-      }}
-    />
-
 
     <Tabs.Screen
       name="index"

@@ -163,6 +163,7 @@ const SearchPage: React.FC = () => {
                   partId={id}
                   apiUrl={apiUrl}
                   token={token}
+                  from={'search'}
                 />
               ))}
               {hasMore && !loading && (
