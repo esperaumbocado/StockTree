@@ -28,10 +28,28 @@ const MyPartCard = ({
 
   const [counter, setCounter] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+
+
   // Locate with WLed
-  const toggleWLED = async () => {
-    console.log('CONNECTING TO WLED... NOT IMPLEMENTED');
-  };
+const toggleWLED = async () => {
+    try {
+        const response = await fetch(`${apiUrl}/api/locate`, {
+            method: "POST",
+            headers: {
+                      'Authorization': `Token ${token}`,
+                      'Content-Type': 'application/json',
+                    },
+            body: JSON.stringify({ plugin: "WledInventreePlugin", location: stockLocationId }),
+        });
+
+        if (!response.ok) {
+            console.log("Error calling Inventree Plugin:", response.statusText);
+        }
+    } catch (error) {
+        console.log("Error calling Inventree Plugin:", error.message);
+    }
+};
+
 
   return (
 

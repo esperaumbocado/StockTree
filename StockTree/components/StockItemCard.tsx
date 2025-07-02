@@ -7,28 +7,31 @@ const StockItemCard = ({ stockItem, apiUrl, refreshData, token }) => {
   const colorScheme = useColorScheme();
   const [counter, setCounter] = useState(0);
   const [isWledOn, setIsWledOn] = useState(false);
-  const WLED_IP = "http://192.168.1.100"; // Replace with actual WLED IP
+  //const WLED_IP = "http://192.168.1.100"; // Replace with actual WLED IP
   const SELECTED_PARTS_KEY = "selected_parts";
-  const toggleWLED = async () => {
-    console.log('CONNECTING TO WLED... NOT IMPLEMENTED');
-  /*
-    try {
-      const response = await fetch(`${WLED_IP}/json/state`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ on: !isWledOn }),
-      });
 
-      if (response.ok) {
-        setIsWledOn(!isWledOn);
-      } else {
-        console.error("Failed to toggle WLED");
-      }
+
+// Locate with WLed
+const toggleWLED = async () => {
+    try {
+        const response = await fetch(`${apiUrl}/api/locate`, {
+            method: "POST",
+            headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ plugin: "WledInventreePlugin", item: stockItem }),
+        });
+
+        if (!response.ok) {
+            console.log("Error calling Inventree Plugin:", response.statusText);
+        }
     } catch (error) {
-      console.error("Error connecting to WLED:", error);
+        console.log("Error calling Inventree Plugin:", error.message);
     }
-   */
-  };
+};
+
+
 
   return (
     <View style={colorScheme === 'dark' ? styles.cardContainerDark : styles.cardContainerLight }>

@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e0cf176e-bbbb-4492-83a1-09da92d510b5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/StockTree/app/(tabs)/explore.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/StockTree/app/(tabs)/explore.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/StockTree/app/(tabs)/locations/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/StockTree/app/(tabs)/locations/[id]/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/StockTree/components/MyPartCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/StockTree/components/MyPartCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/StockTree/components/StockItemCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/StockTree/components/StockItemCard.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
