@@ -1,0 +1,380 @@
+Index: StockTree/app/(tabs)/partDetail/[id].tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React, { useState, useEffect } from 'react';\nimport { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform } from 'react-native';\nimport { useLocalSearchParams } from 'expo-router';\nimport * as SecureStore from 'expo-secure-store';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\nimport PartCard from '@/components/CategoryCard';\nimport { ThemedText } from '@/components/ThemedText';\nimport { ThemedView } from '@/components/ThemedView';\n\nexport default function DetailsScreen() {\n  const { id, partName } = useLocalSearchParams(); // Get the category ID and name from params\n  const colorScheme = useColorScheme();\n  const [part, setPart] = useState([]);\n  const [loading, setLoading] = useState(true);\n  const [apiUrl, setApiUrl] = useState(''); // Define apiUrl state\n\n  // Load the API URL from SecureStore or AsyncStorage depending on the platform\n  const loadApiUrl = async () => {\n    try {\n      let storedUrl;\n      if (Platform.OS === 'web') {\n        storedUrl = await AsyncStorage.getItem('API_URL');\n      } else {\n        storedUrl = await SecureStore.getItemAsync('API_URL');\n      }\n\n      if (storedUrl) {\n        setApiUrl(`${storedUrl}/api/part`);\n      } else {\n        console.error('API URL not found in storage.');\n      }\n    } catch (error) {\n      console.error('Error loading API URL:', error.message);\n    }\n  };\n\n  // Fetch the part selected\n  const fetchPart = async () => {\n    try {\n      setLoading(true);\n\n      if (!apiUrl) {\n        console.error('API URL is not set.');\n        return;\n      }\n\n      console.log('API URL:', apiUrl);\n\n      const params = new URLSearchParams({\n        parent: id,\n      });\n\n      console.log('Request Params:', params.toString());\n\n      const apiEndpoint = `${apiUrl}/${id}/`;\n\n      console.log('Request Headers:', {\n        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',\n        Accept: 'application/json',\n        Connection: 'keep-alive',\n        Host: 'inventree.localhost',\n      });\n\n      const response = await fetch(apiEndpoint, {\n        method: 'GET',\n        headers: {\n          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',\n          Accept: 'application/json',\n          Connection: 'keep-alive',\n          Host: 'inventree.localhost',\n        },\n      });\n\n      if (!response.ok) {\n        throw new Error(`HTTP error! Status: ${response.status}`);\n      }\n\n      const rawData = await response.text();\n      console.log('Raw Response:', rawData); // Log the raw response\n\n      let data;\n      try {\n        data = JSON.parse(rawData);\n      } catch (e) {\n        throw new Error('Error parsing JSON response: ' + e.message);\n      }\n\n      console.log('Parsed Data:', data); // Log the parsed data\n\n      // Handle both array and object responses\n      let fetchedPart;\n        fetchedPart =\n          {\n            id: data.pk,\n            name: data.name,\n            description: data.description,\n            stock: data.in_stock,\n          };\n\n      console.log('FetchedPart', fetchedPart);\n      setPart(fetchedPart);\n    } catch (error) {\n      console.error('Error fetching part:', error.message);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n\n\n  // Load API URL when the component mounts\n  useEffect(() => {\n    loadApiUrl();\n  }, []);\n\n  // Fetch subcategories when apiUrl or category ID changes\n  useEffect(() => {\n    if (apiUrl) {\n      fetchPart();\n    }\n  }, [apiUrl, id]);\n\n  return (\n    <ScrollView style={{ flex: 1 }}>\n      <ThemedView style={[styles.headerContainer, { backgroundColor: colorScheme === 'dark' ? '#A1E8C5' : '#A1E8C5' }]}>\n        <ThemedText type=\"title\" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>\n          {partName}\n        </ThemedText>\n      </ThemedView>\n\n      {loading ? (\n        <ActivityIndicator size=\"large\" color=\"#A1E8C5\" style={styles.loader} />\n      ) : (\n        <View style={styles.categoryContainer}>\n          {part ? (\n              <>\n                    <Text style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>Description: {part.description}</Text>\n                    <Text style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>Stock: {part.stock}</Text>\n                  </>\n            ) : (\n              <ThemedText style={styles.noResults}>No Part found.</ThemedText>\n            )}\n        </View>\n      )}\n    </ScrollView>\n  );\n}\n\nconst styles = StyleSheet.create({\n  headerContainer: {\n    paddingVertical: 20,\n    alignItems: 'center',\n  },\n  headerText: {\n    fontSize: 24,\n    fontWeight: '600',\n    textAlign: 'center',\n  },\n  loader: {\n    marginTop: 20,\n  },\n  categoryContainer: {\n    padding: 16,\n  },\n  noResults: {\n    textAlign: 'center',\n    fontSize: 16,\n    marginTop: 20,\n  },\n});\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/StockTree/app/(tabs)/partDetail/[id].tsx b/StockTree/app/(tabs)/partDetail/[id].tsx
+--- a/StockTree/app/(tabs)/partDetail/[id].tsx	(revision d8406eedeee18dc868aba848465020f62a48b7d7)
++++ b/StockTree/app/(tabs)/partDetail/[id].tsx	(date 1741981142489)
+@@ -55,7 +55,7 @@
+       const apiEndpoint = `${apiUrl}/${id}/`;
+ 
+       console.log('Request Headers:', {
+-        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
++        Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+         Accept: 'application/json',
+         Connection: 'keep-alive',
+         Host: 'inventree.localhost',
+@@ -64,7 +64,7 @@
+       const response = await fetch(apiEndpoint, {
+         method: 'GET',
+         headers: {
+-          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
++          Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+           Accept: 'application/json',
+           Connection: 'keep-alive',
+           Host: 'inventree.localhost',
+Index: StockTree/app/(tabs)/categoryDetail/[id].tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React, { useState, useEffect } from 'react';\nimport { View, Text, StyleSheet, useColorScheme, ScrollView, ActivityIndicator, Platform } from 'react-native';\nimport { useLocalSearchParams } from 'expo-router';\nimport * as SecureStore from 'expo-secure-store';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\nimport CategoryCard from '@/components/CategoryCard';\nimport { ThemedText } from '@/components/ThemedText';\nimport { ThemedView } from '@/components/ThemedView';\nimport { PartCard } from '@/components/PartCard'; // Import PartCard component\n\nexport default function DetailsScreen() {\n  const { id, categoryName } = useLocalSearchParams(); // Get the category ID and name from params\n  const colorScheme = useColorScheme();\n  const [subcategories, setSubcategories] = useState([]);\n  const [parts, setParts] = useState([]);\n  const [loading, setLoading] = useState(true);\n  const [apiUrl, setApiUrl] = useState(''); // Define apiUrl state\n\n  // Load the API URL from SecureStore or AsyncStorage depending on the platform\n  const loadApiUrl = async () => {\n    try {\n      let storedUrl;\n      if (Platform.OS === 'web') {\n        storedUrl = await AsyncStorage.getItem('API_URL');\n      } else {\n        storedUrl = await SecureStore.getItemAsync('API_URL');\n      }\n\n      if (storedUrl) {\n        setApiUrl(`${storedUrl}`);\n      } else {\n        console.error('API URL not found in storage.');\n      }\n    } catch (error) {\n      console.error('Error loading API URL:', error.message);\n    }\n  };\n\n  const fetchParts = async () => {\n    try {\n      setLoading(true);\n      await loadApiUrl();\n      if (!apiUrl) return;\n\n      const params = new URLSearchParams({\n        category: id,\n      });\n\n      console.log('Request Params (Parts): ', params.toString());\n\n      const apiEndpoint = `${apiUrl}/api/part/?${params.toString()}`;\n      console.log('API ENDPOINT (Parts): ', apiEndpoint);\n      const response = await fetch(apiEndpoint, {\n        method: 'GET',\n        headers: {\n          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',\n          Accept: 'application/json',\n          Connection: 'keep-alive',\n          Host: 'inventree.localhost',\n        },\n      });\n\n      if (!response.ok) {\n        throw new Error(`HTTP error! Status (Parts): ${response.status}`);\n      }\n\n      const rawData = await response.text();\n      console.log('Raw Response (Parts):', rawData); // Log the raw response\n\n      let data;\n      try {\n        data = JSON.parse(rawData);\n      } catch (e) {\n        throw new Error('Error parsing JSON response (Parts): ' + e.message);\n      }\n\n      console.log(\"Parsed Data (Parts): \", data); // Log the parsed data\n\n      let fetchedParts;\n      if (Array.isArray(data)) {\n        fetchedParts = data.map((item) => ({\n          id: item.pk,\n          name: item.name,\n          description: item.description,\n          stock: item.in_stock,\n        }));\n      } else {\n        fetchedParts = [\n          {\n            id: data.pk,\n            name: data.name,\n            description: data.description,\n            stock: data.in_stock,\n          },\n        ];\n      }\n\n      setParts(fetchedParts); // Set the fetched parts\n    } catch (error) {\n      console.error('Error fetching parts:', error.message);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  // Fetch subcategories of the current category\n  const fetchSubcategories = async () => {\n    try {\n      setLoading(true);\n\n      if (!apiUrl) {\n        console.error('API URL is not set.');\n        return;\n      }\n\n      console.log('API URL:', apiUrl);\n\n      const params = new URLSearchParams({\n        parent: id,\n        cascade: true,\n        ordering: 'name',\n        depth: 1,\n      });\n\n      console.log('Request Params:', params.toString());\n\n      const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;\n\n      console.log('Request Headers:', {\n        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',\n        Accept: 'application/json',\n        Connection: 'keep-alive',\n        Host: 'inventree.localhost',\n      });\n\n      const response = await fetch(apiEndpoint, {\n        method: 'GET',\n        headers: {\n          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',\n          Accept: 'application/json',\n          Connection: 'keep-alive',\n          Host: 'inventree.localhost',\n        },\n      });\n\n      if (!response.ok) {\n        throw new Error(`HTTP error! Status: ${response.status}`);\n      }\n\n      const rawData = await response.text();\n      console.log('Raw Response:', rawData); // Log the raw response\n\n      let data;\n      try {\n        data = JSON.parse(rawData);\n      } catch (e) {\n        throw new Error('Error parsing JSON response: ' + e.message);\n      }\n\n      console.log('Parsed Data:', data); // Log the parsed data\n\n      // Handle both array and object responses\n      let fetchedSubcategories;\n      if (Array.isArray(data)) {\n        // If the response is an array, map it directly\n        fetchedSubcategories = data.map((item) => ({\n          id: item.pk,\n          name: item.name,\n          description: item.description,\n          partCount: item.part_count,\n          icon: item.icon,\n        }));\n      } else {\n        // If the response is a single object, wrap it in an array\n        fetchedSubcategories = [\n          {\n            id: data.pk,\n            name: data.name,\n            description: data.description,\n            partCount: data.part_count,\n            icon: data.icon,\n          },\n        ];\n      }\n\n      setSubcategories(fetchedSubcategories); // Set the fetched subcategories\n    } catch (error) {\n      console.error('Error fetching subcategories:', error.message);\n    } finally {\n      setLoading(false);\n    }\n  };\n\n  // Load API URL when the component mounts\n  useEffect(() => {\n    loadApiUrl();\n  }, []);\n\n  // Fetch subcategories and parts when apiUrl or category ID changes\n  useEffect(() => {\n    if (apiUrl) {\n      fetchSubcategories();\n      fetchParts();\n    }\n  }, [apiUrl, id]);\n\n  return (\n    <ScrollView style={{ flex: 1 }}>\n      <ThemedView style={[styles.headerContainer, { backgroundColor: colorScheme === 'dark' ? '#A1E8C5' : '#A1E8C5' }]}>\n        <ThemedText type=\"title\" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>\n          {categoryName}\n        </ThemedText>\n      </ThemedView>\n\n      {loading ? (\n        <ActivityIndicator size=\"large\" color=\"#A1E8C5\" style={styles.loader} />\n      ) : (\n        <View style={styles.categoryContainer}>\n          {subcategories.length > 0 ? (\n            <View>\n              <ThemedText style={styles.subcategoryHeader}>Subcategories</ThemedText>\n              {subcategories.map(({ id, name, description, partCount, icon }) => (\n                <CategoryCard\n                  key={id}\n                  name={name}\n                  description={description}\n                  partCount={partCount}\n                  icon={icon}\n                  categoryId={id} // Pass the subcategory ID to the card\n                />\n              ))}\n            </View>\n          ) : (\n            <ThemedText style={styles.noResults}>No subcategories found.</ThemedText>\n          )}\n\n          {parts.length > 0 ? (\n            <View>\n              <ThemedText style={styles.partsHeader}>Parts</ThemedText>\n              {parts.map(({ id, name, description, stock, partId }) => (\n                <PartCard\n                  key={id}\n                  name={name}\n                  stock={stock}\n                  imageUrl={description} // Use imageUrl as per your logic\n                  partId={id}\n                />\n              ))}\n            </View>\n          ) : (\n            <ThemedText style={styles.noResults}>No parts found.</ThemedText>\n          )}\n        </View>\n      )}\n    </ScrollView>\n  );\n}\n\nconst styles = StyleSheet.create({\n  headerContainer: {\n    paddingVertical: 20,\n    alignItems: 'center',\n  },\n  headerText: {\n    fontSize: 24,\n    fontWeight: '600',\n    textAlign: 'center',\n  },\n  loader: {\n    marginTop: 20,\n  },\n  categoryContainer: {\n    padding: 16,\n  },\n  subcategoryHeader: {\n    fontSize: 20,\n    fontWeight: 'bold',\n    marginBottom: 10,\n  },\n  partsHeader: {\n    fontSize: 20,\n    fontWeight: 'bold',\n    marginTop: 20,\n    marginBottom: 10,\n  },\n  noResults: {\n    textAlign: 'center',\n    fontSize: 16,\n    marginTop: 20,\n  },\n});\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/StockTree/app/(tabs)/categoryDetail/[id].tsx b/StockTree/app/(tabs)/categoryDetail/[id].tsx
+--- a/StockTree/app/(tabs)/categoryDetail/[id].tsx	(revision d8406eedeee18dc868aba848465020f62a48b7d7)
++++ b/StockTree/app/(tabs)/categoryDetail/[id].tsx	(date 1741981142489)
+@@ -53,7 +53,7 @@
+       const response = await fetch(apiEndpoint, {
+         method: 'GET',
+         headers: {
+-          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
++          Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+           Accept: 'application/json',
+           Connection: 'keep-alive',
+           Host: 'inventree.localhost',
+@@ -82,6 +82,7 @@
+           id: item.pk,
+           name: item.name,
+           description: item.description,
++          image: item.image ? `http://inventree.localhost/${item.image}` : null,  // CHANGE THIS LATER!!!!!!!
+           stock: item.in_stock,
+         }));
+       } else {
+@@ -90,6 +91,7 @@
+             id: data.pk,
+             name: data.name,
+             description: data.description,
++            image: data.image ? `http://inventree.localhost/${data.image}` : null,  // CHANGE THIS LATER!!!!!!!
+             stock: data.in_stock,
+           },
+         ];
+@@ -127,7 +129,7 @@
+       const apiEndpoint = `${apiUrl}/api/part/category/?${params.toString()}`;
+ 
+       console.log('Request Headers:', {
+-        Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
++        Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+         Accept: 'application/json',
+         Connection: 'keep-alive',
+         Host: 'inventree.localhost',
+@@ -136,7 +138,7 @@
+       const response = await fetch(apiEndpoint, {
+         method: 'GET',
+         headers: {
+-          Authorization: 'Token inv-14194edbbb32e2d6074ecd7b0ccf4dba4c754bc6-20250228',
++          Authorization: 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+           Accept: 'application/json',
+           Connection: 'keep-alive',
+           Host: 'inventree.localhost',
+@@ -237,12 +239,13 @@
+           {parts.length > 0 ? (
+             <View>
+               <ThemedText style={styles.partsHeader}>Parts</ThemedText>
+-              {parts.map(({ id, name, description, stock, partId }) => (
++              {parts.map(({ id, name, description, image, stock, partId }) => (
+                 <PartCard
+                   key={id}
+                   name={name}
+                   stock={stock}
+-                  imageUrl={description} // Use imageUrl as per your logic
++                  image={image}
++                  //description={description} // Use imageUrl as per your logic
+                   partId={id}
+                 />
+               ))}
+Index: StockTree/components/PartCard.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React from \"react\";\nimport { View, Text, StyleSheet, useColorScheme, Pressable} from \"react-native\";\nimport { Link } from 'expo-router';\n\nconst PartCard = ({name, stock, imageUrl, partId}) => {\n      const colorScheme = useColorScheme();\n\n  return (\n    <View style={styles.cardContainer}>\n    <Link\n            href={{\n              pathname: `/partDetail/${partId}`,\n              params: { partName: name }, // Pass the category name as a parameter\n            }}\n            asChild\n          >\n          <Pressable>\n                    {({ pressed }) => (\n                      <View style={[styles.card, {backgroundColor: colorScheme === 'dark' ? '#333' : '#fff', opacity: pressed ? 0.8 : 1,},]}>\n\n        <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>\n        <Text style={[styles.details , { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>In stock: {stock}</Text>\n\n            </View>)}\n        </Pressable>\n      </Link>\n    </View>\n  );\n};\n\nconst styles = StyleSheet.create({\n\n\n  cardContainer: {\n    marginVertical: 8,\n    borderRadius: 8,\n    overflow: 'hidden',\n  },\n  card: {\n    padding: 16,\n    borderRadius: 8,\n    elevation: 2,\n    shadowColor: '#000',\n    shadowOffset: { width: 0, height: 2 },\n    shadowOpacity: 0.2,\n    shadowRadius: 8,\n  },\n  title: {\n    fontSize: 18,\n    fontWeight: \"bold\",\n  },\n  details: {\n    fontSize: 16,\n  },\n  image: {\n      width: 100,\n      height: 100,\n      marginTop: 10,\n      borderRadius: 8,\n    },\n    noImage: {\n      fontSize: 14,\n      color: \"#black\",\n      marginTop: 5,\n    },\n});\n\nexport { PartCard };
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/StockTree/components/PartCard.tsx b/StockTree/components/PartCard.tsx
+--- a/StockTree/components/PartCard.tsx	(revision d8406eedeee18dc868aba848465020f62a48b7d7)
++++ b/StockTree/components/PartCard.tsx	(date 1741981142489)
+@@ -1,8 +1,10 @@
+ import React from "react";
+ import { View, Text, StyleSheet, useColorScheme, Pressable} from "react-native";
++import { Card } from "react-native-paper";
++import ImageCard from './ImageCard';
+ import { Link } from 'expo-router';
+ 
+-const PartCard = ({name, stock, imageUrl, partId}) => {
++const PartCard = ({name, stock, image, partId}) => {
+       const colorScheme = useColorScheme();
+ 
+   return (
+@@ -21,6 +23,10 @@
+         <Text style={[styles.title, { color: colorScheme === 'dark' ? '#fff' : '#333' }]}>{name}</Text>
+         <Text style={[styles.details , { color: colorScheme === 'dark' ? '#ddd' : '#333' }]}>In stock: {stock}</Text>
+ 
++        <ImageCard
++                    imageLink = {image}
++                    token = "inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305"
++                />
+             </View>)}
+         </Pressable>
+       </Link>
+Index: StockTree/app/(tabs)/_layout.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Tabs } from 'expo-router';\nimport React from 'react';\nimport { Platform } from 'react-native';\nimport { ThemedView } from '@/components/ThemedView';\n\nimport { HapticTab } from '@/components/HapticTab';\nimport { IconSymbol } from '@/components/ui/IconSymbol';\nimport TabBarBackground from '@/components/ui/TabBarBackground';\nimport { Colors } from '@/constants/Colors';\nimport { useColorScheme } from '@/hooks/useColorScheme';\nimport FontAwesome from '@expo/vector-icons/FontAwesome';\n\nexport default function TabLayout() {\n  const colorScheme = useColorScheme();\n\n  return (\n    <Tabs\n      screenOptions={{\n        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,\n        headerShown: false,\n        tabBarButton: HapticTab,\n        tabBarBackground: TabBarBackground,\n        tabBarStyle: Platform.select({\n          ios: {\n            // Use a transparent background on iOS to show the blur effect\n            position: 'absolute',\n          },\n          default: {},\n        }),\n      }}>\n      <Tabs.Screen\n        name=\"index\"\n        options={{\n          title: 'Home',\n          tabBarIcon: ({ color }) => <IconSymbol size={28} name=\"house.fill\" color={color} />,\n        }}\n      />\n      <Tabs.Screen\n        name=\"explore\"\n        options={{\n          title: 'Explore',\n          tabBarIcon: ({ color }) => <IconSymbol size={28} name=\"paperplane.fill\" color={color} />,\n        }}\n      />\n      <Tabs.Screen\n        name=\"settings\"\n        options={{\n          title: 'Settings',\n          tabBarIcon: ({ color }) => <FontAwesome name=\"gear\" size={28} color={color} />,\n        }}\n      />\n\n      <Tabs.Screen\n              name=\"categoryDetail\"\n              options={{\n                title: 'Category Detail',\n                href: null,\n                tabBarIcon: ({ color }) => <FontAwesome name=\"gear\" size={28} color={color} />,\n              }}\n            />\n    <Tabs.Screen\n                  name=\"partDetail\"\n                  options={{\n                    title: 'Part Detail',\n                    href: null,\n                    tabBarIcon: ({ color }) => <FontAwesome name=\"gear\" size={28} color={color} />,\n                  }}\n                />\n        </Tabs>\n\n  );\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/StockTree/app/(tabs)/_layout.tsx b/StockTree/app/(tabs)/_layout.tsx
+--- a/StockTree/app/(tabs)/_layout.tsx	(revision d8406eedeee18dc868aba848465020f62a48b7d7)
++++ b/StockTree/app/(tabs)/_layout.tsx	(date 1741981183390)
+@@ -58,15 +58,7 @@
+                 tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
+               }}
+             />
+-    <Tabs.Screen
+-                  name="partDetail"
+-                  options={{
+-                    title: 'Part Detail',
+-                    href: null,
+-                    tabBarIcon: ({ color }) => <FontAwesome name="gear" size={28} color={color} />,
+-                  }}
+-                />
+-        </Tabs>
++    </Tabs>
+ 
+   );
+ }
+Index: StockTree/app/(tabs)/search.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { useEffect, useState } from 'react';\nimport { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput } from 'react-native';\nimport ParallaxScrollView from '@/components/ParallaxScrollView';\nimport { ThemedText } from '@/components/ThemedText';\nimport { ThemedView } from '@/components/ThemedView';\nimport { PartCard } from '@/components/PartCard';\n\n\nconst API_URL = 'http://inventree.localhost/api/part/';\n\nconst SearchPage: React.FC = () => {\n  const [searchQuery, setSearchQuery] = useState<string>('');\n  const [results, setResults] = useState<SearchResult[]>([]);\n  const [loading, setLoading] = useState<boolean>(false);\n\n  // Fetch search results from API\n  const handleSearch = async (text: string) => {\n    setSearchQuery(text);\n    \n    if (text.length < 2) {\n      setResults([]); // Clear results if input is too short\n      return;\n    }\n    console.log('search status:', searchQuery);\n    const params = new URLSearchParams({\n              search: searchQuery,\n            });\n\n    setLoading(true);\n    try {\n      const response = await fetch(`${API_URL}?${params.toString()}`, {\n            method: 'GET',\n            headers: {\n              'Authorization': 'Token inv-2b62c677a3a95b74f349b351333f097472f97f60-20250314',\n              //'Content-Type': 'application/json',\n              'Accept': 'application/json',\n              'Connection': 'keep-alive',\n              'Host': 'inventree.localhost',\n              'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0',\n            },\n\n        });\n      console.log('Response status:', response.status);\n      console.log('Response headers:', response.headers);\n      \n      if (!response.ok) {\n        throw new Error(`HTTP error! Status: ${response.status}`);\n      }\n      const data = await response.json();\n      console.log('data:', data);\n      if (!data) {\n                throw new Error('Empty response received.');\n      }\n      console.log('Raw response data:', data);\n      const BASE_URL = \"http://inventree.localhost\";\n      const parts = data.map(item => ({\n                id: item.pk,                          // Mapping pk to id\n                name: item.name || 'Unknown',  // Using name for location name\n                stock: item.in_stock,                 // Using stock for showing available stock\n\n      }));\n\n      setResults(parts || []);\n    } catch (error) {\n      console.error('Error fetching search results:', error);\n    } finally {\n      setLoading(false);\n    }\n  };\n    return (\n\n        <ParallaxScrollView\n          headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}\n          headerImage={\n            <Image\n              source={{ uri: 'https://via.placeholder.com/100' }}  // Example placeholder image\n              style={styles.logo}\n            />\n          }\n        >\n          <ThemedView style={styles.titleContainer}>\n            <ThemedText type=\"title\">Stock Management</ThemedText>\n          </ThemedView>\n            <TextInput\n                    style={styles.searchBar}\n                    placeholder=\"Search items...\"\n                    value={searchQuery}\n                    onChangeText={handleSearch}\n                  />\n          {loading ? (\n            <ActivityIndicator size=\"large\" color=\"#000\" style={styles.loader} />\n          ) : (\n            <ScrollView style={styles.cardContainer}>\n              {results.map(({ id, name, stock}) => (\n                <PartCard\n                  key={id}\n                  name={name}\n                  stock={stock}\n\n                />\n              ))}\n            </ScrollView>\n          )}\n        </ParallaxScrollView>\n      );\n    }\n\n    const styles = StyleSheet.create({\n      titleContainer: {\n        alignItems: 'center',\n        marginVertical: 16,\n      },\n      logo: {\n        height: 100,\n        width: 100,\n      },\n      loader: {\n        marginTop: 20,\n      },\n      cardContainer: {\n        padding: 16,\n      },\n      searchBar: {\n            height: 40,\n            borderWidth: 1,\n            borderColor: '#ccc',\n            borderRadius: 8,\n            paddingHorizontal: 10,\n            marginBottom: 10,\n      },\n    });\nexport default SearchPage;\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/StockTree/app/(tabs)/search.tsx b/StockTree/app/(tabs)/search.tsx
+--- a/StockTree/app/(tabs)/search.tsx	(revision d8406eedeee18dc868aba848465020f62a48b7d7)
++++ b/StockTree/app/(tabs)/search.tsx	(date 1741981142489)
+@@ -1,13 +1,13 @@
+ import { useEffect, useState } from 'react';
+-import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput } from 'react-native';
++import { Image, StyleSheet, ScrollView, ActivityIndicator, TextInput, TouchableOpacity } from 'react-native';
+ import ParallaxScrollView from '@/components/ParallaxScrollView';
+ import { ThemedText } from '@/components/ThemedText';
+ import { ThemedView } from '@/components/ThemedView';
+ import { PartCard } from '@/components/PartCard';
+-
++import Icon from 'react-native-vector-icons/FontAwesome';
+ 
+ const API_URL = 'http://inventree.localhost/api/part/';
+-
++const BASE_URL = 'http://inventree.localhost/'
+ const SearchPage: React.FC = () => {
+   const [searchQuery, setSearchQuery] = useState<string>('');
+   const [results, setResults] = useState<SearchResult[]>([]);
+@@ -15,28 +15,31 @@
+ 
+   // Fetch search results from API
+   const handleSearch = async (text: string) => {
+-    setSearchQuery(text);
+-    
+-    if (text.length < 2) {
+-      setResults([]); // Clear results if input is too short
+-      return;
+-    }
++      setSearchQuery(text);
++      }
++  const handleSearchButtonPress = async (text: string) => {
++
+     console.log('search status:', searchQuery);
++    /*
+     const params = new URLSearchParams({
+               search: searchQuery,
+             });
++        */
++    const params = new URLSearchParams();
++    params.append('search', searchQuery);
+ 
++    console.log('TEST:', params.toString());
+     setLoading(true);
+     try {
+       const response = await fetch(`${API_URL}?${params.toString()}`, {
+             method: 'GET',
+             headers: {
+-              'Authorization': 'Token inv-2b62c677a3a95b74f349b351333f097472f97f60-20250314',
++              'Authorization': 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+               //'Content-Type': 'application/json',
+               'Accept': 'application/json',
+               'Connection': 'keep-alive',
+               'Host': 'inventree.localhost',
+-              'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:135.0) Gecko/20100101 Firefox/135.0',
++
+             },
+ 
+         });
+@@ -57,6 +60,8 @@
+                 id: item.pk,                          // Mapping pk to id
+                 name: item.name || 'Unknown',  // Using name for location name
+                 stock: item.in_stock,                 // Using stock for showing available stock
++                image: item.image ? `${BASE_URL}${item.image}` : null, // ImageURL
++
+ 
+       }));
+ 
+@@ -81,21 +86,26 @@
+           <ThemedView style={styles.titleContainer}>
+             <ThemedText type="title">Stock Management</ThemedText>
+           </ThemedView>
++
+             <TextInput
+                     style={styles.searchBar}
+                     placeholder="Search items..."
+                     value={searchQuery}
+                     onChangeText={handleSearch}
+                   />
++            <TouchableOpacity style={styles.searchButton} onPress={handleSearchButtonPress}>
++                    <Icon name="search" size={20} color="#fff" />
++            </TouchableOpacity>
+           {loading ? (
+             <ActivityIndicator size="large" color="#000" style={styles.loader} />
+           ) : (
+             <ScrollView style={styles.cardContainer}>
+-              {results.map(({ id, name, stock}) => (
++              {results.map(({ id, name, stock, image}) => (
+                 <PartCard
+                   key={id}
+                   name={name}
+                   stock={stock}
++                  image={image}
+ 
+                 />
+               ))}
+Index: StockTree/components/ImageCard.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/StockTree/components/ImageCard.tsx b/StockTree/components/ImageCard.tsx
+new file mode 100644
+--- /dev/null	(date 1741981142489)
++++ b/StockTree/components/ImageCard.tsx	(date 1741981142489)
+@@ -0,0 +1,90 @@
++import React, { useState, useEffect } from "react";
++import { View, Text, StyleSheet, Image, ActivityIndicator } from "react-native";
++import { Card } from "react-native-paper";
++import RNFetchBlob from 'react-native-fetch-blob';  // Import RNFetchBlob to handle the Blob to Base64 conversion
++
++const ImageCard = ({ imageLink, token }) => {
++  const [imageUrl, setImageUrl] = useState(null);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState(null);
++
++  useEffect(() => {
++    const fetchImage = async () => {
++      try {
++        const response = await fetch(`${imageLink}`, {
++          method: "GET",
++          headers: {
++            'Authorization': `Token ${token}`,  // Use dynamic token passed as a prop
++            'Content-Type': 'application/json',
++            'Accept': "application/json",
++          },
++        });
++
++        if (response.ok) {
++          const data = await response.blob();
++          const base64Data = await blobToBase64(data); // Convert Blob to Base64
++          setImageUrl(`data:image/jpeg;base64,${base64Data}`); // Set the image source as base64 string
++        } else {
++          throw new Error("Failed to fetch image.");
++        }
++      } catch (error) {
++        setError(`Error: ${error.message}`);
++      } finally {
++        setLoading(false);
++      }
++    };
++
++    fetchImage();
++  }, [imageLink, token]);
++
++  // Function to convert Blob to Base64 string
++  const blobToBase64 = (blob) => {
++    return new Promise((resolve, reject) => {
++      const reader = new FileReader();
++      reader.onloadend = () => resolve(reader.result.split(',')[1]); // Get only the base64 string
++      reader.onerror = reject;
++      reader.readAsDataURL(blob);
++    });
++  };
++
++  return (
++    <Card style={styles.card}>
++      <Card.Content>
++        {loading && <ActivityIndicator size="large" color="#0000ff" />}
++        {error && <Text style={styles.error}>{error}</Text>}
++        {imageUrl ? (
++          <Image source={{ uri: imageUrl }} style={styles.image} />
++        ) : (
++          !loading && <Text style={styles.noImage}>No image available</Text>
++        )}
++      </Card.Content>
++    </Card>
++  );
++};
++
++const styles = StyleSheet.create({
++  card: {
++    margin: 10,
++    padding: 10,
++    borderRadius: 10,
++    elevation: 3,
++    backgroundColor: "#fff",
++  },
++  image: {
++    width: 200,
++    height: 200,
++    borderRadius: 10,
++  },
++  noImage: {
++    fontSize: 14,
++    color: "gray",
++    marginTop: 10,
++  },
++  error: {
++    fontSize: 14,
++    color: "red",
++    marginTop: 10,
++  },
++});
++
++export default ImageCard;
+Index: StockTree/app/(tabs)/index.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\nimport React, { useState, useEffect, useCallback } from 'react';\nimport { ScrollView, ActivityIndicator, RefreshControl, StyleSheet, useColorScheme, View, Image, Button, Platform } from 'react-native';\nimport * as SecureStore from 'expo-secure-store';\nimport AsyncStorage from '@react-native-async-storage/async-storage';\nimport ParallaxScrollView from '@/components/ParallaxScrollView';\nimport { ThemedText } from '@/components/ThemedText';\nimport { ThemedView } from '@/components/ThemedView';\nimport LocationCard from '@/components/LocationCard';\nimport CategoryCard from '@/components/CategoryCard';\nimport { useFocusEffect } from '@react-navigation/native';\nimport { useRouter } from 'expo-router';\n\n\nexport default function HomeScreen({ navigation }) {\n  const router = useRouter(); // ✅ Define router\n  const [categories, setCategories] = useState([]);\n  const [loading, setLoading] = useState(true);\n  const [apiUrl, setApiUrl] = useState('');\n  const [refreshing, setRefreshing] = useState(false);\n  const colorScheme = useColorScheme();\n\n  const fetchCategories = async () => {\n    try {\n      setLoading(true);\n      await loadApiUrl();\n      if (!apiUrl) return;\n\n      const params = new URLSearchParams({\n        cascade: false, // Example limit, adjust as necessary\n        ordering: 'name',\n      });\n\n      const response = await fetch(`${apiUrl}/api/part/category/?${params.toString()}`, {\n        method: 'GET',\n        headers: {\n          'Authorization': 'Token inv-2b62c677a3a95b74f349b351333f097472f97f60-20250314',\n          'Accept': 'application/json',\n          'Connection': 'keep-alive',\n          'Host': 'inventree.localhost',\n        },\n      });\n\n      if (!response.ok) {\n        throw new Error(`HTTP error! Status: ${response.status}`);\n      }\n\n      const rawData = await response.text();\n\n      let data;\n      try {\n        data = JSON.parse(rawData);  // Attempt to parse the response as JSON\n      } catch (e) {\n        throw new Error('Error parsing JSON response: ' + e.message);\n      }\n\n      const fetchedCategories = data.map(item => ({\n        id: item.pk,\n        name: item.name,\n        description: item.description,\n        partCount: item.part_count,\n        icon: item.icon,\n      }));\n\n      setCategories(fetchedCategories);\n    } catch (error) {\n      console.error('Error fetching categories:', error.message);\n    } finally {\n      setLoading(false);\n      setRefreshing(false);\n    }\n  };\n\n  // Load the API URL from storage (SecureStore for mobile, AsyncStorage for web)\n  const loadApiUrl = async () => {\n    try {\n      let storedUrl;\n      if (Platform.OS === 'web') {\n        storedUrl = await AsyncStorage.getItem('API_URL');\n      } else {\n        storedUrl = await SecureStore.getItemAsync('API_URL');\n      }\n\n      if (storedUrl) {\n        setApiUrl(`${storedUrl}`);\n      }\n    } catch (error) {\n      console.error('Error loading API URL:', error);\n    }\n  };\n\n  const onRefresh = async () => {\n    setRefreshing(true);\n    await fetchCategories();\n  };\n\n  useFocusEffect(\n    useCallback(() => {\n      fetchCategories();\n    }, [apiUrl])\n  );\n\n  return (\n      <ScrollView\n        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}\n      >\n        <ParallaxScrollView\n          headerBackgroundColor={{ light: '#A1E8C5', dark: '#A1E8C5' }}\n          contentBackgroundColor=\"white\"\n          headerImage={\n            <View style={styles.logoContainer}>\n              <Image\n                source={require('@/assets/images/fraunhofer.png')}\n                style={styles.logo}\n              />\n            </View>\n          }\n        >\n          <ThemedView style={styles.titleContainer}>\n            <ThemedText type=\"title\" style={[styles.headerText, { color: colorScheme === 'dark' ? '#fff' : '#1D3D47' }]}>\n              Categories\n            </ThemedText>\n          </ThemedView>\n        </ParallaxScrollView>\n\n        {loading ? (\n          <ActivityIndicator size=\"large\" color=\"#A1E8C5\" style={styles.loader} />\n        ) : (\n          <View style={styles.categoryContainer}>\n            {categories.map(({ id, name, description, partCount, icon }) => (\n              <CategoryCard\n                key={id}\n                name={name}\n                description={description}\n                partCount={partCount}\n                icon={icon}\n                navigation={navigation} // Pass navigation to CategoryCard\n                categoryId={id} // Pass the category ID to the card\n              />\n            ))}\n          </View>\n        )}\n      </ScrollView>\n    );\n}\n\nconst styles = StyleSheet.create({\n  titleContainer: {\n    alignItems: 'center',\n    marginVertical: 16,\n  },\n  headerText: {\n    fontSize: 28,\n    fontWeight: '600',\n    textAlign: 'center',\n  },\n  loader: {\n    marginTop: 20,\n  },\n  categoryContainer: {\n    padding: 16,\n  },\n  logoContainer: {\n    justifyContent: 'center',\n    alignItems: 'center',\n    height: 250,\n    flexDirection: 'column',\n  },\n  logo: {\n    height: 100,\n    width: '80%',\n    borderRadius: 10,\n    marginBottom: 16,\n  },\n});\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/StockTree/app/(tabs)/index.tsx b/StockTree/app/(tabs)/index.tsx
+--- a/StockTree/app/(tabs)/index.tsx	(revision d8406eedeee18dc868aba848465020f62a48b7d7)
++++ b/StockTree/app/(tabs)/index.tsx	(date 1741981142489)
+@@ -34,7 +34,7 @@
+       const response = await fetch(`${apiUrl}/api/part/category/?${params.toString()}`, {
+         method: 'GET',
+         headers: {
+-          'Authorization': 'Token inv-2b62c677a3a95b74f349b351333f097472f97f60-20250314',
++          'Authorization': 'Token inv-d3705ca8173ca063004eb382caed18a7c169ebd2-20250305',
+           'Accept': 'application/json',
+           'Connection': 'keep-alive',
+           'Host': 'inventree.localhost',
