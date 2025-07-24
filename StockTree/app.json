@@ -3,6 +3,7 @@
     "name": "StockTree",
     "slug": "StockTree",
     "version": "1.0.0",
+    "owner": "goncmoreira",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -25,6 +26,14 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -50,7 +59,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "779ed420-78ae-4657-9a18-4348471f76ae"
+        "projectId": "fb770c5e-57d9-4f30-bc4e-92766b21bf4f"
       }
     }
   }
