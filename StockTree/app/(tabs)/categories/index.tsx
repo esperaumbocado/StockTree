@@ -52,7 +52,6 @@ export default function Categories() {
           'Authorization': `Token ${token}`,
           'Accept': 'application/json',
           'Connection': 'keep-alive',
-          'Host': 'inventree.localhost',
         },
       });
 
