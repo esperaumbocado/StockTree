@@ -310,6 +310,7 @@ export default function MyListParts(){
 
     console.log("myParts");
     console.log(myParts);
+    refreshData();
     return (
         <>
           <ScrollView style={{ flex: 1 }}>
