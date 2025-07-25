@@ -9,7 +9,7 @@ export default function MyListsLayout() {
   const backIcon = Platform.OS === 'ios' ? 'chevron-back' : 'arrow-back-sharp';
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={[]}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <Stack initialRouteName="index"
         screenOptions={{
           headerShown: false,

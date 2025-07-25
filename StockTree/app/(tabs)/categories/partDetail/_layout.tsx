@@ -14,7 +14,7 @@ export default function PartDetailLayout() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={[]}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top']}>
       <Stack
         screenOptions={{
           headerShown: true,
