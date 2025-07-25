@@ -237,27 +237,66 @@ export default function MyListParts(){
 
 
     useEffect(() => {
-      refreshData();
-    }, [myList]); // runs when there are changes in myList
+      const loadListAndParts = async () => {
+        const list = await getListById(listId);
+        if (list) {
+          setMyList(list);           // <- Isto é assíncrono, mas tu não esperas pelo "set"
+          const parts = await fetchMyListPartsFromList(list); // <- então passamos diretamente o list
+          setMyParts(parts);
+        }
+      };
 
-    useEffect(() => {
-      setUpMyList();
-    }, [apiUrl]); // runs when there are changes in apiUrl
+      if (apiUrl && token) {
+        loadListAndParts();
+      }
+    }, [apiUrl, token, listId]);
 
+    const fetchMyListPartsFromList = async (list) => {
+      const partAssociations = list.items.map(item => ({
+        partId: item.partId,
+        stockLocationId: item.stockLocationId,
+      }));
 
+      if (partAssociations.length === 0) return [];
+
+      const partIds = partAssociations.map(item => item.partId);
+      const stockIds = partAssociations.map(item => item.stockLocationId);
+
+      setLoading(true);
+
+      const parts = await fetchMultipleParts(partIds, apiUrl, token);
+      const stockItems = await fetchStockItems(stockIds, apiUrl, token);
+
+      const partMap = new Map(parts.map(part => [part.pk, part]));
+      const stockMap = new Map(stockItems.map(stock => [stock.stockId, stock]));
+
+      const mergedData = partAssociations.map(({ partId, stockLocationId }) => {
+        const part = partMap.get(partId);
+        const stockItem = stockMap.get(stockLocationId);
+
+        return {
+          ...(part || { pk: partId }),
+          stockLocationId,
+          stockName: stockItem ? stockItem.name : 'Unknown Location',
+          available_stock: stockItem ? stockItem.available_stock : 0,
+          isPartMissing: !part,
+          isStockMissing: !stockItem,
+        };
+      });
+
+      setLoading(false);
+      return mergedData;
+    };
 
     useFocusEffect(
-      useCallback(() => {
-        const loadApiData = async () => {
-                await loadApiUrl();
-                await defToken();
-        };
-        const loadData = async () => {await setUpMyList();};
-        loadApiData();
-
-        loadData();
-      }, [])
-    );  // runs when the screen is focused
+       useCallback(() => {
+         const loadEverything = async () => {
+           await loadApiUrl();
+           await defToken();
+         };
+         loadEverything();
+       }, [])
+     );
 
     const handleRemoveSelected = async () => {
         if (myParts.length > 0) {
@@ -310,7 +349,6 @@ export default function MyListParts(){
 
     console.log("myParts");
     console.log(myParts);
-    refreshData();
     return (
         <>
           <ScrollView style={{ flex: 1 }}>
