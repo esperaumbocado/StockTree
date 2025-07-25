@@ -51,8 +51,6 @@ export default function Locations() {
         headers: {
           'Authorization': `Token ${token}`,
           'Accept': 'application/json',
-          'Connection': 'keep-alive',
-          'Host': 'inventree.localhost',
         },
       });
 
